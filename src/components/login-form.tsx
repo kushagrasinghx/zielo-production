@@ -1,15 +1,19 @@
 import { useState } from "react"
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth"
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "firebase/auth"
+import { FirebaseError } from "firebase/app"
 import { auth } from "@/firebase"
 import { useNavigate } from "react-router-dom"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -48,19 +52,30 @@ export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
     try {
       await signInWithEmailAndPassword(auth, email, password)
       navigate("/")
-    } catch (err: any) {
-      if (err.code === 'auth/user-not-found') {
-        setError('No account found with this email. Please sign up first.');
-      } else if (err.code === 'auth/wrong-password') {
-        setError('Incorrect password. Please try again.');
-      } else if (err.code === 'auth/invalid-email') {
-        setError('Invalid email address. Please check and try again.');
-      } else if (err.code === 'auth/too-many-requests') {
-        setError('Too many failed attempts. Please try again later.');
+    } catch (err: unknown) {
+      console.error("Sign-in error:", err)
+
+      if (err instanceof FirebaseError) {
+        switch (err.code) {
+          case 'auth/user-not-found':
+            setError('No account found with this email. Please sign up first.')
+            break
+          case 'auth/wrong-password':
+            setError('Incorrect password. Please try again.')
+            break
+          case 'auth/invalid-email':
+            setError('Invalid email address. Please check and try again.')
+            break
+          case 'auth/too-many-requests':
+            setError('Too many failed attempts. Please try again later.')
+            break
+          default:
+            setError(`Error: ${err.message}`)
+            break
+        }
       } else {
-        setError('Failed to sign in. Please try again.');
+        setError("Unexpected error occurred. Please try again.")
       }
-      console.error(err)
     } finally {
       setLoading(false)
     }
