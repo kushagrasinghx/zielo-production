@@ -8,12 +8,13 @@ import { SignupForm } from "@/components/signup-form"
 import Layout from './layout';
 import { PageTitle } from './components/PageTitle';
 
-import AllBrands from '../src/pages/AllBrands';
-import BrandCollaborate from '../src/pages/BrandCollaborate';
-import CollaborationStatus from '../src/pages/CollaborationStatus';
-import Coupon from '../src/pages/Coupon';
-import Affiliate from '../src/pages/Affiliate';
-import Settings from '../src/pages/Settings';
+import AllBrands from './pages/AllBrands';
+import BrandCollaborate from './pages/BrandCollaborate';
+import CollaborationStatus from './pages/CollaborationStatus';
+import Coupon from './pages/Coupon';
+import Affiliate from './pages/Affiliate';
+import Settings from './pages/Settings';
+import CouponHistory from './pages/CouponHistory';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -75,6 +76,7 @@ function App() {
                   <Route path="/brand/:brandName" element={<BrandCollaborate />} />
                   <Route path="/collaboration" element={<CollaborationStatus />} />
                   <Route path="/coupon" element={<Coupon />} />
+                  <Route path="/coupon-history" element={<CouponHistory />} />
                   <Route path="/affiliate" element={<Affiliate />} />
                   <Route path="/settings" element={<Settings />} />
                 </Routes>

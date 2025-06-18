@@ -1,23 +1,26 @@
-import { useState } from "react";
 import { CouponCard } from "@/components/CouponCard";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { History } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Coupon() {
-  const [search, setSearch] = useState("");
   const availablePoints = 250; // This can be dynamic if needed
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-2 w-full">
       <div className="flex items-center justify-between gap-2 w-full flex-row">
         {/* Available Points on the left */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Available Points:</span>
+          <span className="text-sm text-muted-foreground">Available Points:</span>
           <span className="text-base font-semibold text-[#A32035]">{availablePoints}</span>
         </div>
         {/* History button on the right */}
-        <Button size="sm" className="bg-[#A32035] hover:bg-[#8a1a2b] text-white font-medium h-8 px-2 rounded-md flex items-center gap-1 text-xs">
+        <Button
+          size="sm"
+          className="bg-[#A32035] hover:bg-[#8a1a2b] text-white font-medium h-8 px-2 rounded-md flex items-center gap-1 text-xs"
+          onClick={() => navigate("/coupon-history")}
+        >
           <History className="w-4 h-4" />
           Coupons History
         </Button>

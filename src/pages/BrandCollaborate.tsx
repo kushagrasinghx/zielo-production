@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, Calendar, Users, Eye, Target, ChevronDown, ChevronUp, X, Heart, MessageCircle, Share, Upload, FileText, Image, Video, ClipboardList } from 'lucide-react';
+import { Star, Calendar, Users, ChevronDown, ChevronUp, Heart, MessageCircle, Upload, FileText, Image, Video, ClipboardList } from 'lucide-react';
 import { brands } from '@/data/brands';
 import {
   Dialog,
@@ -8,7 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogOverlay,
   DialogDescription,
 } from "@/components/ui/dialog";
 

@@ -1,4 +1,4 @@
-import { Home, Users, Settings, Gift, Link2, BarChart } from "lucide-react"
+import { Home, Settings, Gift, Link2, BarChart } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
