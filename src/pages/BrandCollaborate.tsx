@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, Calendar, Users, Eye, Target, ChevronDown, ChevronUp, X, Heart, MessageCircle, Share, Upload, FileText, Image, Video } from 'lucide-react';
+import { ArrowLeft, Star, Calendar, Users, Eye, Target, ChevronDown, ChevronUp, X, Heart, MessageCircle, Share, Upload, FileText, Image, Video, ClipboardList } from 'lucide-react';
 import { brands } from '@/data/brands';
 
 const BrandCollaborate = () => {
@@ -19,6 +19,7 @@ const BrandCollaborate = () => {
     url: '',
     uploadMethod: 'file'
   });
+  const [logoError, setLogoError] = useState(false);
   
   // Find the brand by name (URL encoded)
   const brand = brands.find(b => 
@@ -27,8 +28,8 @@ const BrandCollaborate = () => {
 
   if (!brand) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-gray-500">Brand not found</p>
+      <div className="flex items-center justify-center h-[80vh] max-w-[300px]">
+        <p className="text-gray-500">Brand not found! Please check the URL and try again.</p>
       </div>
     );
   }
@@ -89,10 +90,10 @@ const BrandCollaborate = () => {
       <div className="mb-6">
         <button
           onClick={handleCustomUpload}
-          className="w-full p-3 border-2 border-dashed border-[#9F1D35] rounded-xl text-[#9F1D35] hover:bg-[#fce8ec] transition-colors flex items-center justify-center gap-2 text-sm"
+          className="w-full p-2 border border-dashed border-[#9F1D35] rounded-lg text-[#9F1D35] hover:bg-[#fce8ec] transition-colors flex items-center justify-center gap-2 text-xs font-medium"
         >
-          <Upload size={16} />
-          <span className="font-medium">Upload Custom Content</span>
+          <Upload size={14} />
+          <span>Upload Custom Content</span>
         </button>
       </div>
 
@@ -152,7 +153,7 @@ const BrandCollaborate = () => {
 
                 {/* Requirements */}
                 <div>
-                  <h5 className="text-sm font-medium text-gray-900 mb-2">📋 Requirements</h5>
+                  <h5 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2"><ClipboardList size={16} className="text-[#9F1D35]" /> Requirements</h5>
                   <ul className="space-y-1">
                     {opportunity.requirements.map((req: string, index: number) => (
                       <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
@@ -165,7 +166,7 @@ const BrandCollaborate = () => {
 
                 {/* Guidelines */}
                 <div>
-                  <h5 className="text-sm font-medium text-gray-900 mb-2">📝 Guidelines</h5>
+                  <h5 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2"><FileText size={16} className="text-[#9F1D35]" /> Guidelines</h5>
                   <ul className="space-y-1">
                     {opportunity.guidelines.map((guideline: string, index: number) => (
                       <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
@@ -178,7 +179,7 @@ const BrandCollaborate = () => {
 
                 {/* Deadline */}
                 <div>
-                  <h5 className="text-sm font-medium text-gray-900 mb-2">⏰ Deadline</h5>
+                  <h5 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2"><Calendar size={16} className="text-[#9F1D35]" /> Deadline</h5>
                   <p className="text-sm text-gray-600">{opportunity.deadline}</p>
                 </div>
 
@@ -234,8 +235,8 @@ const BrandCollaborate = () => {
           
           {/* Creator Info - Instagram style */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/50 to-transparent p-3">
-            <div className="flex items-center justify-between text-white">
-              <span className="text-sm font-medium">{item.creator}</span>
+            <div className="flex flex-col items-start text-white">
+              <span className="text-sm font-medium mb-2">{item.creator}</span>
               <div className="flex items-center gap-3 text-xs">
                 <div className="flex items-center gap-1">
                   <Heart size={12} />
@@ -265,12 +266,12 @@ const BrandCollaborate = () => {
             Dashboard
           </button>
           <span>›</span>
-          <span className="text-gray-900">Brand Collaborate Details</span>
+          <span className="text-gray-900">Brand Details</span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Panel - Brand Information */}
-          <div className="lg:col-span-5 space-y-6">
+          <div className="w-full space-y-6">
             {/* Hero Section */}
             <div 
               className="relative h-48 rounded-2xl mb-6 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100"
@@ -283,20 +284,25 @@ const BrandCollaborate = () => {
 
             {/* About Brand Section */}
             <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">About {brand.name}</h2>
+              <h2 className="text-sm font-medium text-gray-900 mb-4">About {brand.name}</h2>
               
               {/* Brand Header */}
               <div className="flex items-start gap-4 mb-4">
-                <div className="bg-gray-800 p-3 rounded-xl flex-shrink-0">
-                  <img
-                    src={brand.logo}
-                    alt={brand.name}
-                    className="w-14 h-14 object-contain filter brightness-0 invert"
-                  />
+                <div className="w-14 h-14 bg-[#f3f5f9] rounded-xl flex items-center justify-center border border-[#e2e8f0] overflow-hidden">
+                  {brand.logo && !logoError ? (
+                    <img
+                      src={brand.logo}
+                      alt={brand.name}
+                      className="object-cover w-full h-full"
+                      onError={() => setLogoError(true)}
+                    />
+                  ) : (
+                    <span className="text-2xl font-bold text-gray-400">{brand.name[0]}</span>
+                  )}
                 </div>
 
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3 mb-0.5">
                     <h3 className="text-lg font-bold text-gray-900">{brand.name}</h3>
                     <div className="flex items-center gap-1">
                       <Star size={14} fill="#FEC84B" color="#FEC84B" />
@@ -324,7 +330,7 @@ const BrandCollaborate = () => {
 
               {/* Brand Story */}
               <div className="mb-4">
-                <h4 className="text-base font-semibold text-gray-900 mb-2">Brand Story</h4>
+                <h4 className="text-sm font-semibold text-gray-900 mb-0.5">Brand Story</h4>
                 <p className="text-gray-600 leading-relaxed text-sm">
                   {brand.brandStory}
                 </p>
@@ -333,13 +339,13 @@ const BrandCollaborate = () => {
               {/* Brand Voice & Target Audience */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <h4 className="text-base font-semibold text-gray-900 mb-2">Brand Voice & Tone</h4>
+                  <h4 className="text-sm font-semibold text-gray-900 mb-0.5">Brand Voice & Tone</h4>
                   <p className="text-gray-600 text-sm leading-relaxed">
                     {brand.brandVoice}
                   </p>
                 </div>
                 <div>
-                  <h4 className="text-base font-semibold text-gray-900 mb-2">Target Audience</h4>
+                  <h4 className="text-sm font-semibold text-gray-900 mb-0.5">Target Audience</h4>
                   <p className="text-gray-600 text-sm leading-relaxed">
                     {brand.targetAudience}
                   </p>
@@ -349,7 +355,7 @@ const BrandCollaborate = () => {
           </div>
 
           {/* Right Panel - Tabs and Content */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="w-full space-y-6">
             {/* Tabs */}
             <div className="border-b border-gray-200">
               <nav className="flex space-x-8">
