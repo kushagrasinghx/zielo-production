@@ -13,12 +13,14 @@ export default function Layout({ children, user }: { children: React.ReactNode, 
     <SidebarProvider>
       <div className="flex min-h-screen">
         <AppSidebar user={user} />
-        <main className="flex-1 p-6">
+        <main className="flex-1 flex flex-col p-6 min-h-0">
           <div className="flex items-center gap-2 mb-4">
             <SidebarTrigger className="cursor-pointer"/>
             <h1 className="text-2sm font-medium text-sidebar-foreground">{pageName}</h1>
           </div>
-          {children}
+          <div className="flex-1 min-h-0 flex flex-col">
+            {children}
+          </div>
         </main>
       </div>
     </SidebarProvider>

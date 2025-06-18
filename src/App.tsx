@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import type { User } from 'firebase/auth';
@@ -7,14 +7,16 @@ import { LoginForm } from "@/components/login-form"
 import { SignupForm } from "@/components/signup-form"
 import Layout from './layout';
 import { PageTitle } from './components/PageTitle';
+import { DashboardLoader } from './components/DashboardLoader';
 
-import AllBrands from './pages/AllBrands';
-import BrandCollaborate from './pages/BrandCollaborate';
-import CollaborationStatus from './pages/CollaborationStatus';
-import Coupon from './pages/Coupon';
-import Affiliate from './pages/Affiliate';
-import Settings from './pages/Settings';
-import CouponHistory from './pages/CouponHistory';
+// Lazy load pages
+const AllBrands = lazy(() => import('./pages/AllBrands'));
+const BrandCollaborate = lazy(() => import('./pages/BrandCollaborate'));
+const CollaborationStatus = lazy(() => import('./pages/CollaborationStatus'));
+const Coupon = lazy(() => import('./pages/Coupon'));
+const Affiliate = lazy(() => import('./pages/Affiliate'));
+const Settings = lazy(() => import('./pages/Settings'));
+const CouponHistory = lazy(() => import('./pages/CouponHistory'));
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -71,15 +73,17 @@ function App() {
             path="/*"
             element={
               <Layout user={user}>
-                <Routes>
-                  <Route path="/" element={<AllBrands />} />
-                  <Route path="/brand/:brandName" element={<BrandCollaborate />} />
-                  <Route path="/collaboration" element={<CollaborationStatus />} />
-                  <Route path="/coupon" element={<Coupon />} />
-                  <Route path="/coupon-history" element={<CouponHistory />} />
-                  <Route path="/affiliate" element={<Affiliate />} />
-                  <Route path="/settings" element={<Settings />} />
-                </Routes>
+                <Suspense fallback={<DashboardLoader />}>
+                  <Routes>
+                    <Route path="/" element={<AllBrands />} />
+                    <Route path="/brand/:brandName" element={<BrandCollaborate />} />
+                    <Route path="/collaboration" element={<CollaborationStatus />} />
+                    <Route path="/coupon" element={<Coupon />} />
+                    <Route path="/coupon-history" element={<CouponHistory />} />
+                    <Route path="/affiliate" element={<Affiliate />} />
+                    <Route path="/settings" element={<Settings />} />
+                  </Routes>
+                </Suspense>
               </Layout>
             }
           />

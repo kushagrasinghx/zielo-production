@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar"
-import { useLocation } from "react-router-dom"
+import { useLocation, Link } from "react-router-dom"
 
 // Accept user as a prop
 export function AppSidebar({ user }: { user: any }) {
@@ -58,10 +58,10 @@ export function AppSidebar({ user }: { user: any }) {
                     className={location.pathname === item.url ? 'font-medium' : ''}
                     style={location.pathname === item.url ? { color: 'var(--primary)' } : {}}
                   >
-                    <a href={item.url}>
+                    <Link to={item.url}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -79,10 +79,10 @@ export function AppSidebar({ user }: { user: any }) {
               className={location.pathname === "/settings" ? 'font-medium' : ''}
               style={location.pathname === "/settings" ? { color: 'var(--primary)' } : {}}
             >
-              <a href="/settings">
+              <Link to="/settings">
                 <Settings className="h-4 w-4" />
                 <span>Settings</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
