@@ -1,7 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, Calendar, Users, Eye, Target, ChevronDown, ChevronUp, X, Heart, MessageCircle, Share, Upload, FileText, Image, Video, ClipboardList } from 'lucide-react';
 import { brands } from '@/data/brands';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogOverlay,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 const BrandCollaborate = () => {
   const { brandName } = useParams();
@@ -20,11 +29,19 @@ const BrandCollaborate = () => {
     uploadMethod: 'file'
   });
   const [logoError, setLogoError] = useState(false);
+  const [savedOpportunities, setSavedOpportunities] = useState<number[]>([]);
   
   // Find the brand by name (URL encoded)
   const brand = brands.find(b => 
     b.name.toLowerCase().replace(/\s+/g, '-') === brandName?.toLowerCase()
   );
+
+  // Set page title
+  useEffect(() => {
+    if (brand) {
+      document.title = `${brand.name} - Brand Collaboration`;
+    }
+  }, [brand]);
 
   if (!brand) {
     return (
@@ -82,6 +99,15 @@ const BrandCollaborate = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleSaveForLater = (opportunityId: number) => {
+    setSavedOpportunities(prev => {
+      if (prev.includes(opportunityId)) {
+        return prev.filter(id => id !== opportunityId);
+      }
+      return [...prev, opportunityId];
+    });
   };
 
   const renderOpportunities = () => (
@@ -184,15 +210,30 @@ const BrandCollaborate = () => {
                 </div>
 
                 {/* Apply Button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleApply(opportunity);
-                  }}
-                  className="w-full bg-[#9F1D35] text-white py-2.5 rounded-xl font-medium hover:bg-[#8a1a2e] transition-colors text-sm"
-                >
-                  Apply Now
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSaveForLater(opportunity.id);
+                    }}
+                    className={`flex-1 py-1.5 px-3 rounded-lg font-medium text-xs transition-colors ${
+                      savedOpportunities.includes(opportunity.id)
+                        ? 'bg-[#fce8ec] text-[#9F1D35] hover:bg-[#fad7df]'
+                        : 'border border-[#9F1D35] text-[#9F1D35] hover:bg-[#fce8ec]'
+                    }`}
+                  >
+                    {savedOpportunities.includes(opportunity.id) ? 'Saved' : 'Save for Later'}
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleApply(opportunity);
+                    }}
+                    className="flex-1 bg-[#9F1D35] text-white py-1.5 px-3 rounded-lg font-medium hover:bg-[#8a1a2e] transition-colors text-xs"
+                  >
+                    Apply Now
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -266,7 +307,7 @@ const BrandCollaborate = () => {
             Dashboard
           </button>
           <span>›</span>
-          <span className="text-gray-900">Brand Details</span>
+          <span className="text-gray-900">{brand.name}</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -361,7 +402,7 @@ const BrandCollaborate = () => {
               <nav className="flex space-x-8">
                 {[
                   { id: 'opportunities', label: 'Opportunities' },
-                  { id: 'ugc-portfolio', label: 'UGC Portfolio' }
+                  { id: 'ugc-portfolio', label: 'Portfolio' }
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -388,29 +429,17 @@ const BrandCollaborate = () => {
       </div>
 
       {/* Apply Confirmation Popup */}
-      {showApplyPopup && selectedOpportunity && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-          {/* Blurred Transparent Backdrop */}
-          <div 
-            className="absolute inset-0 backdrop-blur-sm bg-white/10"
-            onClick={closeApplyPopup}
-          ></div>
+      <Dialog open={showApplyPopup} onOpenChange={setShowApplyPopup}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirm Application</DialogTitle>
+            <DialogDescription>
+              Review the opportunity details before confirming your application.
+            </DialogDescription>
+          </DialogHeader>
           
-          {/* Modal */}
-          <div className="relative bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl border border-gray-200">
-            {/* Header */}
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Confirm Application</h2>
-              <button
-                onClick={closeApplyPopup}
-                className="text-gray-500 hover:text-gray-700 p-1"
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            {/* Content */}
-            <div className="space-y-4 mb-6">
+          {selectedOpportunity && (
+            <div className="space-y-4">
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">{selectedOpportunity.title}</h3>
                 <p className="text-sm text-gray-600">{selectedOpportunity.description}</p>
@@ -433,182 +462,166 @@ const BrandCollaborate = () => {
                 </p>
               </div>
             </div>
+          )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-3">
-              <button
-                onClick={closeApplyPopup}
-                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmApply}
-                className="flex-1 bg-[#9F1D35] text-white py-3 rounded-lg font-medium hover:bg-[#8a1a2e] transition-colors"
-              >
-                Confirm Application
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          <DialogFooter className="flex gap-3 sm:gap-3">
+            <button
+              onClick={closeApplyPopup}
+              className="flex-1 border border-gray-300 text-gray-700 py-1.5 px-3 rounded-lg font-medium hover:bg-gray-50 transition-colors text-xs"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirmApply}
+              className="flex-1 bg-[#9F1D35] text-white py-1.5 px-3 rounded-lg font-medium hover:bg-[#8a1a2e] transition-colors text-xs"
+            >
+              Confirm Application
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Custom Upload Popup */}
-      {showCustomUploadPopup && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-          {/* Blurred Transparent Backdrop */}
-          <div 
-            className="absolute inset-0 backdrop-blur-sm bg-white/10"
-            onClick={closeCustomUploadPopup}
-          ></div>
-          
-          {/* Modal */}
-          <div className="relative bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl border border-gray-200 max-h-[90vh] overflow-y-auto">
-            {/* Header */}
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Upload Custom Content</h2>
-              <button
-                onClick={closeCustomUploadPopup}
-                className="text-gray-500 hover:text-gray-700 p-1"
-              >
-                <X size={24} />
-              </button>
+      <Dialog open={showCustomUploadPopup} onOpenChange={setShowCustomUploadPopup}>
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Upload Custom Content</DialogTitle>
+            <DialogDescription>
+              Fill in the details to submit your custom content for this brand.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            {/* Title */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Content Title</label>
+              <input
+                type="text"
+                placeholder="e.g., My skincare routine with EcoBeauty"
+                value={customUploadData.title}
+                onChange={(e) => handleCustomUploadChange('title', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9F1D35] focus:border-transparent text-sm"
+              />
             </div>
 
-            {/* Form */}
-            <div className="space-y-6">
-              {/* Title */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Content Title</label>
-                <input
-                  type="text"
-                  placeholder="e.g., My skincare routine with EcoBeauty"
-                  value={customUploadData.title}
-                  onChange={(e) => handleCustomUploadChange('title', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9F1D35] focus:border-transparent"
-                />
-              </div>
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <textarea
+                rows={4}
+                placeholder="Describe your content and how it relates to the brand..."
+                value={customUploadData.description}
+                onChange={(e) => handleCustomUploadChange('description', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9F1D35] focus:border-transparent resize-none text-sm"
+              />
+            </div>
 
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                <textarea
-                  rows={4}
-                  placeholder="Describe your content and how it relates to the brand..."
-                  value={customUploadData.description}
-                  onChange={(e) => handleCustomUploadChange('description', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9F1D35] focus:border-transparent resize-none"
-                />
-              </div>
-
-              {/* Content Type */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">Content Type</label>
-                <div className="flex gap-4">
-                  {[
-                    { value: 'image', label: 'Image', icon: <Image size={16} /> },
-                    { value: 'video', label: 'Video', icon: <Video size={16} /> },
-                    { value: 'text', label: 'Text Post', icon: <FileText size={16} /> }
-                  ].map((type) => (
-                    <label key={type.value} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="contentType"
-                        value={type.value}
-                        checked={customUploadData.contentType === type.value}
-                        onChange={(e) => handleCustomUploadChange('contentType', e.target.value)}
-                        className="w-4 h-4 text-[#9F1D35] focus:ring-[#9F1D35]"
-                      />
-                      <div className="flex items-center gap-1">
-                        {type.icon}
-                        <span className="text-sm text-gray-700">{type.label}</span>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Upload Method */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">Upload Method</label>
-                <div className="flex gap-4 mb-4">
-                  <label className="flex items-center gap-2 cursor-pointer">
+            {/* Content Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Content Type</label>
+              <div className="flex gap-4">
+                {[
+                  { value: 'image', label: 'Image', icon: <Image size={16} /> },
+                  { value: 'video', label: 'Video', icon: <Video size={16} /> },
+                  { value: 'text', label: 'Text Post', icon: <FileText size={16} /> }
+                ].map((type) => (
+                  <label key={type.value} className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="uploadMethod"
-                      value="file"
-                      checked={customUploadData.uploadMethod === 'file'}
-                      onChange={(e) => handleCustomUploadChange('uploadMethod', e.target.value)}
+                      name="contentType"
+                      value={type.value}
+                      checked={customUploadData.contentType === type.value}
+                      onChange={(e) => handleCustomUploadChange('contentType', e.target.value)}
                       className="w-4 h-4 text-[#9F1D35] focus:ring-[#9F1D35]"
                     />
-                    <span className="text-sm text-gray-700">Upload File</span>
+                    <div className="flex items-center gap-1">
+                      {type.icon}
+                      <span className="text-sm text-gray-700">{type.label}</span>
+                    </div>
                   </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="uploadMethod"
-                      value="url"
-                      checked={customUploadData.uploadMethod === 'url'}
-                      onChange={(e) => handleCustomUploadChange('uploadMethod', e.target.value)}
-                      className="w-4 h-4 text-[#9F1D35] focus:ring-[#9F1D35]"
-                    />
-                    <span className="text-sm text-gray-700">Paste URL</span>
-                  </label>
-                </div>
+                ))}
+              </div>
+            </div>
 
-                {customUploadData.uploadMethod === 'file' ? (
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#9F1D35] transition-colors cursor-pointer">
-                    <Upload size={32} className="mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm text-gray-500">
-                      Drag & drop or click to <span className="text-[#9F1D35] underline cursor-pointer">upload</span>
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      Supports: JPG, PNG, MP4, MOV (max 50MB)
-                    </p>
-                  </div>
-                ) : (
+            {/* Upload Method */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Upload Method</label>
+              <div className="flex gap-4 mb-4">
+                <label className="flex items-center gap-2 cursor-pointer">
                   <input
-                    type="url"
-                    placeholder="Paste your content URL here (Instagram, TikTok, YouTube, etc.)"
-                    value={customUploadData.url}
-                    onChange={(e) => handleCustomUploadChange('url', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9F1D35] focus:border-transparent"
+                    type="radio"
+                    name="uploadMethod"
+                    value="file"
+                    checked={customUploadData.uploadMethod === 'file'}
+                    onChange={(e) => handleCustomUploadChange('uploadMethod', e.target.value)}
+                    className="w-4 h-4 text-[#9F1D35] focus:ring-[#9F1D35]"
                   />
-                )}
+                  <span className="text-sm text-gray-700">Upload File</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="uploadMethod"
+                    value="url"
+                    checked={customUploadData.uploadMethod === 'url'}
+                    onChange={(e) => handleCustomUploadChange('uploadMethod', e.target.value)}
+                    className="w-4 h-4 text-[#9F1D35] focus:ring-[#9F1D35]"
+                  />
+                  <span className="text-sm text-gray-700">Paste URL</span>
+                </label>
               </div>
 
-              {/* Guidelines */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="text-sm font-medium text-blue-900 mb-2">Content Guidelines</h4>
-                <ul className="text-xs text-blue-800 space-y-1">
-                  <li>• Ensure content aligns with {brand.name}'s brand values</li>
-                  <li>• Include clear product visibility if featuring brand products</li>
-                  <li>• Use authentic, high-quality visuals</li>
-                  <li>• Follow platform-specific best practices</li>
-                  <li>• Disclose any brand partnerships appropriately</li>
-                </ul>
-              </div>
+              {customUploadData.uploadMethod === 'file' ? (
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#9F1D35] transition-colors cursor-pointer">
+                  <Upload size={32} className="mx-auto mb-2 text-gray-400" />
+                  <p className="text-sm text-gray-500">
+                    Drag & drop or click to <span className="text-[#9F1D35] underline cursor-pointer">upload</span>
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Supports: JPG, PNG, MP4, MOV (max 50MB)
+                  </p>
+                </div>
+              ) : (
+                <input
+                  type="url"
+                  placeholder="Paste your content URL here (Instagram, TikTok, YouTube, etc.)"
+                  value={customUploadData.url}
+                  onChange={(e) => handleCustomUploadChange('url', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9F1D35] focus:border-transparent text-sm"
+                />
+              )}
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 mt-8">
-              <button
-                onClick={closeCustomUploadPopup}
-                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCustomUploadSubmit}
-                disabled={!customUploadData.title || !customUploadData.description}
-                className="flex-1 bg-[#9F1D35] text-white py-3 rounded-lg font-medium hover:bg-[#8a1a2e] transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-              >
-                Submit Content
-              </button>
+            {/* Guidelines */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-blue-900 mb-2">Content Guidelines</h4>
+              <ul className="text-xs text-blue-800 space-y-1">
+                <li>• Ensure content aligns with {brand.name}'s brand values</li>
+                <li>• Include clear product visibility if featuring brand products</li>
+                <li>• Use authentic, high-quality visuals</li>
+                <li>• Follow platform-specific best practices</li>
+                <li>• Disclose any brand partnerships appropriately</li>
+              </ul>
             </div>
           </div>
-        </div>
-      )}
+
+          <DialogFooter className="flex gap-3 sm:gap-3">
+            <button
+              onClick={closeCustomUploadPopup}
+              className="flex-1 border border-gray-300 text-gray-700 py-1.5 px-3 rounded-lg font-medium hover:bg-gray-50 transition-colors text-xs"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleCustomUploadSubmit}
+              disabled={!customUploadData.title || !customUploadData.description}
+              className="flex-1 bg-[#9F1D35] text-white py-1.5 px-3 rounded-lg font-medium hover:bg-[#8a1a2e] transition-colors text-xs disabled:bg-gray-300 disabled:cursor-not-allowed"
+            >
+              Submit Content
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
