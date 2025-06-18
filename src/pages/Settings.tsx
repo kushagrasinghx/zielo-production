@@ -17,7 +17,7 @@ export default function Settings() {
 
   return (
     <div className="space-y-4">
-      <p className="text-muted-foreground">Configure your account and application settings.</p>
+      <p className="text-sm text-muted-foreground">Configure your account and application settings.</p>
       
       <div className="pt-4">
         <Button 

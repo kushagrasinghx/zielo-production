@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   Card,
   CardTitle,
@@ -55,7 +56,7 @@ export function BrandCard({
           </div>
         </div>
 
-        <CardContent className="pt-0 pb-1 px-6">
+        <CardContent className="px-6 py-2">
           <CardDescription className="text-sm leading-snug text-gray-700 mb-2">
             {description}
           </CardDescription>
@@ -79,12 +80,14 @@ export function BrandCard({
             {activeCampaigns.toString().padStart(2, "0")}
           </span>
         </span>
-        <Button
-          className="bg-[#fbeaec] text-[#9F1D35] text-xs font-medium rounded-md px-4 py-1.5 hover:bg-[#9F1D35] hover:text-white border border-[#f3cdd3]"
-          size="sm"
-        >
-          Collaborate
-        </Button>
+        <Link to={`/brand/${name.toLowerCase().replace(/\s+/g, '-')}`}>
+          <Button
+            className="bg-[#fbeaec] text-[#9F1D35] text-xs font-medium rounded-md px-4 py-1.5 hover:bg-[#9F1D35] hover:text-white border border-[#f3cdd3]"
+            size="sm"
+          >
+            Collaborate
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   );

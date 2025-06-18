@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '@/firebase';
-import { cn } from "@/lib/utils"
+
 import { Button } from "@/components/ui/button"
 import {
   Card,

@@ -6,8 +6,10 @@ import { auth } from '@/firebase';
 import { LoginForm } from "@/components/login-form"
 import { SignupForm } from "@/components/signup-form"
 import Layout from './layout';
+import { PageTitle } from './components/PageTitle';
 
 import AllBrands from '../src/pages/AllBrands';
+import BrandCollaborate from '../src/pages/BrandCollaborate';
 import CollaborationStatus from '../src/pages/CollaborationStatus';
 import Coupon from '../src/pages/Coupon';
 import Affiliate from '../src/pages/Affiliate';
@@ -45,39 +47,43 @@ function App() {
   }
 
   return (
-    <Routes>
-      <Route path="/login" element={
-        <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-          <div className="flex w-full max-w-sm flex-col gap-6">
-            <a href="#" className="flex items-center gap-2 self-center font-medium">
-              <img src="/logo.png" alt="Zielo Logo" className="size-6" />
-              Zielo
-            </a>
-            {showSignup ? (
-              <SignupForm onSwitchToLogin={() => setShowSignup(false)} />
-            ) : (
-              <LoginForm onSwitchToSignup={() => setShowSignup(true)} />
-            )}
+    <>
+      <PageTitle />
+      <Routes>
+        <Route path="/login" element={
+          <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+            <div className="flex w-full max-w-sm flex-col gap-6">
+              <a href="#" className="flex items-center gap-2 self-center font-medium">
+                <img src="/logo.png" alt="Zielo Logo" className="size-6" />
+                Zielo
+              </a>
+              {showSignup ? (
+                <SignupForm onSwitchToLogin={() => setShowSignup(false)} />
+              ) : (
+                <LoginForm onSwitchToSignup={() => setShowSignup(true)} />
+              )}
+            </div>
           </div>
-        </div>
-      } />
-      {user && (
-        <Route
-          path="/*"
-          element={
-            <Layout user={user}>
-              <Routes>
-                <Route path="/" element={<AllBrands />} />
-                <Route path="/collaboration" element={<CollaborationStatus />} />
-                <Route path="/coupon" element={<Coupon />} />
-                <Route path="/affiliate" element={<Affiliate />} />
-                <Route path="/settings" element={<Settings />} />
-              </Routes>
-            </Layout>
-          }
-        />
-      )}
-    </Routes>
+        } />
+        {user && (
+          <Route
+            path="/*"
+            element={
+              <Layout user={user}>
+                <Routes>
+                  <Route path="/" element={<AllBrands />} />
+                  <Route path="/brand/:brandName" element={<BrandCollaborate />} />
+                  <Route path="/collaboration" element={<CollaborationStatus />} />
+                  <Route path="/coupon" element={<Coupon />} />
+                  <Route path="/affiliate" element={<Affiliate />} />
+                  <Route path="/settings" element={<Settings />} />
+                </Routes>
+              </Layout>
+            }
+          />
+        )}
+      </Routes>
+    </>
   );
 }
 
