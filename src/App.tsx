@@ -8,21 +8,33 @@ import { SignupForm } from "@/components/signup-form"
 import Layout from './layout';
 import { PageTitle } from './components/PageTitle';
 import { DashboardLoader } from './components/DashboardLoader';
+import Onboarding from './pages/onboarding';
+import { BrandLayout } from './layout';
 
-// Lazy load pages
-const AllBrands = lazy(() => import('./pages/AllBrands'));
-const BrandCollaborate = lazy(() => import('./pages/BrandCollaborate'));
+// Lazy load creator pages
+const CreatorAllBrands = lazy(() => import('./pages/creator/AllBrands'));
+const CreatorBrandCollaborate = lazy(() => import('./pages/creator/BrandCollaborate'));
+// Lazy load brand pages
+const BrandDashboard = lazy(() => import('./pages/brand/BrandDashboard'));
+const BrandCampaigns = lazy(() => import('./pages/brand/Campaigns'));
+const BrandAnalytics = lazy(() => import('./pages/brand/Analytics'));
+const BrandBarter = lazy(() => import('./pages/brand/Barter'));
+const BrandAffiliate = lazy(() => import('./pages/brand/Affiliate'));
+const BrandWallet = lazy(() => import('./pages/brand/Wallet'));
+const BrandSettings = lazy(() => import('./pages/brand/Settings'));
 const CollaborationStatus = lazy(() => import('./pages/CollaborationStatus'));
 const Coupon = lazy(() => import('./pages/Coupon'));
+const CouponHistory = lazy(() => import('./pages/CouponHistory'));
 const Affiliate = lazy(() => import('./pages/Affiliate'));
 const Settings = lazy(() => import('./pages/Settings'));
-const CouponHistory = lazy(() => import('./pages/CouponHistory'));
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [showSignup, setShowSignup] = useState(false);
+  const [isNewUser, setIsNewUser] = useState(false);
   const location = useLocation();
+  const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser: User | null) => {
@@ -45,6 +57,10 @@ function App() {
     return <Navigate to="/login" replace />;
   }
 
+  if (user && isNewUser && location.pathname !== '/onboarding') {
+    return <Navigate to="/onboarding" replace />;
+  }
+
   if (user && location.pathname === '/login') {
     return <Navigate to="/" replace />;
   }
@@ -61,22 +77,46 @@ function App() {
                 Zielo
               </a>
               {showSignup ? (
-                <SignupForm onSwitchToLogin={() => setShowSignup(false)} />
+                <SignupForm onSwitchToLogin={() => setShowSignup(false)} onSignupSuccess={() => setIsNewUser(true)} />
               ) : (
                 <LoginForm onSwitchToSignup={() => setShowSignup(true)} />
               )}
             </div>
           </div>
         } />
-        {user && (
+        <Route path="/onboarding" element={<Onboarding />} />
+        {/* Brand routes */}
+        {user && userType === 'brand' && !isNewUser && (
+          <Route
+            path="/*"
+            element={
+              <BrandLayout user={user}>
+                <Suspense fallback={<DashboardLoader />}>
+                  <Routes>
+                    <Route path="/" element={<BrandDashboard />} />
+                    <Route path="/brand-dashboard" element={<BrandDashboard />} />
+                    <Route path="/brand-campaigns" element={<BrandCampaigns />} />
+                    <Route path="/brand-analytics" element={<BrandAnalytics />} />
+                    <Route path="/brand-barter" element={<BrandBarter />} />
+                    <Route path="/brand-affiliate" element={<BrandAffiliate />} />
+                    <Route path="/brand-wallet" element={<BrandWallet />} />
+                    <Route path="/brand-settings" element={<BrandSettings />} />
+                  </Routes>
+                </Suspense>
+              </BrandLayout>
+            }
+          />
+        )}
+        {/* Creator routes */}
+        {user && userType !== 'brand' && !isNewUser && (
           <Route
             path="/*"
             element={
               <Layout user={user}>
                 <Suspense fallback={<DashboardLoader />}>
                   <Routes>
-                    <Route path="/" element={<AllBrands />} />
-                    <Route path="/brand/:brandName" element={<BrandCollaborate />} />
+                    <Route path="/" element={<CreatorAllBrands />} />
+                    <Route path="/brand/:brandName" element={<CreatorBrandCollaborate />} />
                     <Route path="/collaboration" element={<CollaborationStatus />} />
                     <Route path="/coupon" element={<Coupon />} />
                     <Route path="/coupon-history" element={<CouponHistory />} />

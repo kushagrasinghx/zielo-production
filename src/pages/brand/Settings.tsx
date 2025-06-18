@@ -1,0 +1,32 @@
+import { signOut } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
+import { auth } from '@/firebase';
+import { Button } from '@/components/ui/button';
+
+export default function Settings() {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate('/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">Configure your brand account and application settings.</p>
+      <div className="pt-4">
+        <Button 
+          variant="destructive" 
+          onClick={handleLogout}
+          className="w-full sm:w-auto"
+        >
+          Logout
+        </Button>
+      </div>
+    </div>
+  );
+} 

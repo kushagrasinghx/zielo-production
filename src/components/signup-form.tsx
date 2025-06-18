@@ -16,9 +16,10 @@ import { Label } from "@/components/ui/label"
 
 interface SignupFormProps {
   onSwitchToLogin: () => void;
+  onSignupSuccess?: () => void;
 }
 
-export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
+export function SignupForm({ onSwitchToLogin, onSignupSuccess }: SignupFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -29,6 +30,7 @@ export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
+      if (onSignupSuccess) onSignupSuccess();
       navigate('/');
     } catch (err: any) {
       if (err.code === 'auth/popup-closed-by-user') {
@@ -47,6 +49,7 @@ export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
+      if (onSignupSuccess) onSignupSuccess();
       navigate('/');
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
