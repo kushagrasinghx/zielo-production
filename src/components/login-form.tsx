@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/firebase';
 
 interface LoginFormProps {
   onSwitchToSignup: () => void;
@@ -32,8 +34,15 @@ export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
   const handleGoogleSignIn = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      navigate("/");
+      const result = await signInWithPopup(auth, provider);
+      // Check Firestore for userType
+      const user = result.user;
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists() && userDoc.data().userType) {
+        navigate("/");
+      } else {
+        navigate("/onboarding");
+      }
     } catch (err: any) {
       if (err.code === 'auth/popup-closed-by-user') {
         setError('Sign in was cancelled. Please try again.');

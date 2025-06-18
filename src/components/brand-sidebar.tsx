@@ -1,4 +1,4 @@
-import { Home, BarChart, Gift, Link2, Briefcase, Wallet, Settings, Shuffle } from "lucide-react";
+import { Home, BarChart, Link2, Briefcase, Wallet, Settings, Shuffle } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,

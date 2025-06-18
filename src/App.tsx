@@ -8,12 +8,19 @@ import { SignupForm } from "@/components/signup-form"
 import Layout from './layout';
 import { PageTitle } from './components/PageTitle';
 import { DashboardLoader } from './components/DashboardLoader';
-import Onboarding from './pages/onboarding';
+import NewUser from './pages/NewUser.tsx';
 import { BrandLayout } from './layout';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from './firebase';
 
 // Lazy load creator pages
 const CreatorAllBrands = lazy(() => import('./pages/creator/AllBrands'));
 const CreatorBrandCollaborate = lazy(() => import('./pages/creator/BrandCollaborate'));
+const CollaborationStatus = lazy(() => import('./pages/creator/CollaborationStatus'));
+const Coupon = lazy(() => import('./pages/creator/Coupon'));
+const CouponHistory = lazy(() => import('./pages/creator/CouponHistory'));
+const Affiliate = lazy(() => import('./pages/creator/Affiliate'));
+const Settings = lazy(() => import('./pages/creator/Settings'));
 // Lazy load brand pages
 const BrandDashboard = lazy(() => import('./pages/brand/BrandDashboard'));
 const BrandCampaigns = lazy(() => import('./pages/brand/Campaigns'));
@@ -22,19 +29,14 @@ const BrandBarter = lazy(() => import('./pages/brand/Barter'));
 const BrandAffiliate = lazy(() => import('./pages/brand/Affiliate'));
 const BrandWallet = lazy(() => import('./pages/brand/Wallet'));
 const BrandSettings = lazy(() => import('./pages/brand/Settings'));
-const CollaborationStatus = lazy(() => import('./pages/CollaborationStatus'));
-const Coupon = lazy(() => import('./pages/Coupon'));
-const CouponHistory = lazy(() => import('./pages/CouponHistory'));
-const Affiliate = lazy(() => import('./pages/Affiliate'));
-const Settings = lazy(() => import('./pages/Settings'));
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [showSignup, setShowSignup] = useState(false);
-  const [isNewUser, setIsNewUser] = useState(false);
+  const [userType, setUserType] = useState<string | null>(null);
+  const [checkingUserType, setCheckingUserType] = useState(false);
   const location = useLocation();
-  const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser: User | null) => {
@@ -44,7 +46,32 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  if (loading) {
+  // Fetch userType from Firestore after login
+  useEffect(() => {
+    const fetchUserType = async () => {
+      if (user) {
+        setCheckingUserType(true);
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          if (data.userType) {
+            setUserType(data.userType);
+            localStorage.setItem('userType', data.userType);
+          } else {
+            setUserType(null);
+            localStorage.removeItem('userType');
+          }
+        } else {
+          setUserType(null);
+          localStorage.removeItem('userType');
+        }
+        setCheckingUserType(false);
+      }
+    };
+    fetchUserType();
+  }, [user]);
+
+  if (loading || checkingUserType) {
     return (
       <div className="h-screen flex flex-col justify-center items-center bg-[#f3f5f9] font-[Segoe UI] text-[1.1rem] text-[#333]">
         <div className="w-10 h-10 border-4 border-gray-300 border-t-[#9F1D35] rounded-full animate-spin mb-4" />
@@ -57,8 +84,14 @@ function App() {
     return <Navigate to="/login" replace />;
   }
 
-  if (user && isNewUser && location.pathname !== '/onboarding') {
-    return <Navigate to="/onboarding" replace />;
+  // Only show onboarding if user is logged in and userType is missing
+  if (user && !userType && location.pathname !== '/new-user') {
+    return <Navigate to="/new-user" replace />;
+  }
+
+  // If userType exists, never show onboarding again
+  if (user && userType && location.pathname === '/new-user') {
+    return <Navigate to="/" replace />;
   }
 
   if (user && location.pathname === '/login') {
@@ -77,16 +110,16 @@ function App() {
                 Zielo
               </a>
               {showSignup ? (
-                <SignupForm onSwitchToLogin={() => setShowSignup(false)} onSignupSuccess={() => setIsNewUser(true)} />
+                <SignupForm onSwitchToLogin={() => setShowSignup(false)} onSignupSuccess={() => setUserType(null)} />
               ) : (
                 <LoginForm onSwitchToSignup={() => setShowSignup(true)} />
               )}
             </div>
           </div>
         } />
-        <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/new-user" element={<NewUser />} />
         {/* Brand routes */}
-        {user && userType === 'brand' && !isNewUser && (
+        {user && userType === 'brand' && (
           <Route
             path="/*"
             element={
@@ -101,6 +134,7 @@ function App() {
                     <Route path="/brand-affiliate" element={<BrandAffiliate />} />
                     <Route path="/brand-wallet" element={<BrandWallet />} />
                     <Route path="/brand-settings" element={<BrandSettings />} />
+                    <Route path="*" element={<BrandDashboard />} />
                   </Routes>
                 </Suspense>
               </BrandLayout>
@@ -108,7 +142,7 @@ function App() {
           />
         )}
         {/* Creator routes */}
-        {user && userType !== 'brand' && !isNewUser && (
+        {user && userType !== 'brand' && (
           <Route
             path="/*"
             element={
@@ -122,6 +156,7 @@ function App() {
                     <Route path="/coupon-history" element={<CouponHistory />} />
                     <Route path="/affiliate" element={<Affiliate />} />
                     <Route path="/settings" element={<Settings />} />
+                    <Route path="*" element={<CreatorAllBrands />} />
                   </Routes>
                 </Suspense>
               </Layout>

@@ -37,4 +37,4 @@ export default function AllBrands() {
       </div>
     </div>
   );
-} 
+}
