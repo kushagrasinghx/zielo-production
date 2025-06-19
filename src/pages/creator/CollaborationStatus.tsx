@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { brands } from '@/data/brands';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Star } from 'lucide-react';
+import { Star, Upload, FileText, Image, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter as DialogFooterUI, DialogDescription } from '@/components/ui/dialog';
+import type { Brand } from '@/data/types';
 
 // Mock status assignment for demo (in real app, this would come from backend/user data)
 const statusMap = [
@@ -20,11 +23,47 @@ const statusAssignments = brands.reduce((acc, brand, idx) => {
   return acc;
 }, {} as Record<string, typeof brands>);
 
+const initialUploadData = {
+  title: '',
+  description: '',
+  contentType: 'image',
+  file: null,
+  url: '',
+  uploadMethod: 'file',
+};
+
 export default function CollaborationStatus() {
+  const [showUploadPopup, setShowUploadPopup] = useState(false);
+  const [uploadBrand, setUploadBrand] = useState<Brand | null>(null);
+  const [uploadMode, setUploadMode] = useState<'submit' | 'resubmit'>('submit');
+  const [customUploadData, setCustomUploadData] = useState(initialUploadData);
+
+  const openUploadPopup = (brand: Brand, mode: 'submit' | 'resubmit') => {
+    setUploadBrand(brand);
+    setUploadMode(mode);
+    setShowUploadPopup(true);
+    setCustomUploadData(initialUploadData);
+  };
+
+  const closeUploadPopup = () => {
+    setShowUploadPopup(false);
+    setUploadBrand(null);
+    setCustomUploadData(initialUploadData);
+  };
+
+  const handleCustomUploadChange = (field: string, value: any) => {
+    setCustomUploadData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleCustomUploadSubmit = () => {
+    // Handle custom upload logic here
+    closeUploadPopup();
+  };
+
   return (
     <div className="w-full">
       <div className="grid w-full gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {statusMap.map((status, i) => (
+        {statusMap.map((status) => (
           <div key={status.key} className="flex flex-col min-w-0">
             <div className={`border-b pb-1 mb-2 ${status.border}`}> 
               <span className={`font-semibold text-sm ${status.color}`}>{status.label} ({statusAssignments[status.key]?.length || 0})</span>
@@ -65,7 +104,7 @@ export default function CollaborationStatus() {
                   {status.key === 'pending' && (
                     <div className="flex gap-2 px-4 pb-4 pt-0">
                       <Button size="sm" className="flex-1 bg-[#fbeaec] text-[#9F1D35] font-medium text-xs border border-[#f3cdd3] hover:bg-[#fad7df] py-1.5 px-2">Archive</Button>
-                      <Button size="sm" className="flex-1 bg-[#9F1D35] text-white hover:bg-[#8a1a2e] text-xs py-1.5 px-2">Submit</Button>
+                      <Button size="sm" className="flex-1 bg-[#9F1D35] text-white hover:bg-[#8a1a2e] text-xs py-1.5 px-2" onClick={() => openUploadPopup(brand, 'submit')}>Submit</Button>
                     </div>
                   )}
                   {status.key === 'archived' && (
@@ -75,7 +114,7 @@ export default function CollaborationStatus() {
                   )}
                   {status.key === 'rejected' && (
                     <div className="flex gap-2 px-4 pb-4 pt-0">
-                      <Button size="sm" className="flex-1 bg-[#fbeaec] text-[#9F1D35] font-medium text-xs border border-[#f3cdd3] hover:bg-[#fad7df] py-1.5 px-2">Resubmit</Button>
+                      <Button size="sm" className="flex-1 bg-[#fbeaec] text-[#9F1D35] font-medium text-xs border border-[#f3cdd3] hover:bg-[#fad7df] py-1.5 px-2" onClick={() => openUploadPopup(brand, 'resubmit')}>Resubmit</Button>
                     </div>
                   )}
                 </Card>
@@ -87,6 +126,149 @@ export default function CollaborationStatus() {
           </div>
         ))}
       </div>
+
+      {/* Custom Upload Popup for Submit/Resubmit */}
+      <Dialog open={showUploadPopup} onOpenChange={setShowUploadPopup}>
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{uploadMode === 'submit' ? 'Submit Content' : 'Resubmit Content'}</DialogTitle>
+            <DialogDescription>
+              Fill in the details to {uploadMode === 'submit' ? 'submit' : 'resubmit'} your content for <span className="font-semibold text-[#9F1D35]">{uploadBrand?.name}</span>.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            {/* Title */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Content Title</label>
+              <input
+                type="text"
+                placeholder={`e.g., My collaboration with ${uploadBrand?.name || ''}`}
+                value={customUploadData.title}
+                onChange={e => handleCustomUploadChange('title', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9F1D35] focus:border-transparent text-sm"
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <textarea
+                rows={4}
+                placeholder="Describe your content and how it relates to the brand..."
+                value={customUploadData.description}
+                onChange={e => handleCustomUploadChange('description', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9F1D35] focus:border-transparent resize-none text-sm"
+              />
+            </div>
+
+            {/* Content Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Content Type</label>
+              <div className="flex gap-4">
+                {[
+                  { value: 'image', label: 'Image', icon: <Image size={16} /> },
+                  { value: 'video', label: 'Video', icon: <Video size={16} /> },
+                  { value: 'text', label: 'Text Post', icon: <FileText size={16} /> }
+                ].map((type) => (
+                  <label key={type.value} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="contentType"
+                      value={type.value}
+                      checked={customUploadData.contentType === type.value}
+                      onChange={e => handleCustomUploadChange('contentType', e.target.value)}
+                      className="w-4 h-4 text-[#9F1D35] focus:ring-[#9F1D35]"
+                    />
+                    <div className="flex items-center gap-1">
+                      {type.icon}
+                      <span className="text-sm text-gray-700">{type.label}</span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Upload Method */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Upload Method</label>
+              <div className="flex gap-4 mb-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="uploadMethod"
+                    value="file"
+                    checked={customUploadData.uploadMethod === 'file'}
+                    onChange={e => handleCustomUploadChange('uploadMethod', e.target.value)}
+                    className="w-4 h-4 text-[#9F1D35] focus:ring-[#9F1D35]"
+                  />
+                  <span className="text-sm text-gray-700">Upload File</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="uploadMethod"
+                    value="url"
+                    checked={customUploadData.uploadMethod === 'url'}
+                    onChange={e => handleCustomUploadChange('uploadMethod', e.target.value)}
+                    className="w-4 h-4 text-[#9F1D35] focus:ring-[#9F1D35]"
+                  />
+                  <span className="text-sm text-gray-700">Paste URL</span>
+                </label>
+              </div>
+
+              {customUploadData.uploadMethod === 'file' ? (
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#9F1D35] transition-colors cursor-pointer">
+                  <Upload size={32} className="mx-auto mb-2 text-gray-400" />
+                  <p className="text-sm text-gray-500">
+                    Drag & drop or click to <span className="text-[#9F1D35] underline cursor-pointer">upload</span>
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Supports: JPG, PNG, MP4, MOV (max 50MB)
+                  </p>
+                </div>
+              ) : (
+                <input
+                  type="url"
+                  placeholder="Paste your content URL here (Instagram, TikTok, YouTube, etc.)"
+                  value={customUploadData.url}
+                  onChange={e => handleCustomUploadChange('url', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9F1D35] focus:border-transparent text-sm"
+                />
+              )}
+            </div>
+
+            {/* Guidelines */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-blue-900 mb-2">Content Guidelines</h4>
+              <ul className="text-xs text-blue-800 space-y-1">
+                <li>• Ensure content aligns with {uploadBrand?.name}'s brand values</li>
+                <li>• Include clear product visibility if featuring brand products</li>
+                <li>• Use authentic, high-quality visuals</li>
+                <li>• Follow platform-specific best practices</li>
+                <li>• Disclose any brand partnerships appropriately</li>
+              </ul>
+            </div>
+          </div>
+
+          <DialogFooterUI className="flex gap-3 sm:gap-3">
+            <Button
+              variant="outline"
+              onClick={closeUploadPopup}
+              className="flex-1 border border-gray-300 text-gray-700 py-1.5 px-3 rounded-lg font-medium hover:bg-gray-50 transition-colors text-xs"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCustomUploadSubmit}
+              disabled={!customUploadData.title || !customUploadData.description}
+              className="flex-1 bg-[#9F1D35] text-white py-1.5 px-3 rounded-lg font-medium hover:bg-[#8a1a2e] transition-colors text-xs disabled:bg-gray-300 disabled:cursor-not-allowed"
+            >
+              Submit
+            </Button>
+          </DialogFooterUI>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 } 
