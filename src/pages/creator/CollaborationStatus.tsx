@@ -61,7 +61,12 @@ export default function CollaborationStatus() {
   };
 
   return (
-    <div className="w-full">
+    <div className="space-y-6 w-full">
+      <div>
+          <p className="text-sm text-muted-foreground">
+            View and manage your brand collaborations by status.
+          </p>
+        </div>
       <div className="grid w-full gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {statusMap.map((status) => (
           <div key={status.key} className="flex flex-col min-w-0">

@@ -9,6 +9,11 @@ export default function Coupon() {
 
   return (
     <div className="space-y-2 w-full">
+      <div>
+          <p className="text-sm text-muted-foreground">
+            View and redeem exclusive brand coupons using your points.
+          </p>
+        </div>
       <div className="flex items-center justify-between gap-2 w-full flex-row">
         {/* Available Points on the left */}
         <div className="flex items-center gap-2">
