@@ -79,40 +79,42 @@ export default function Affiliate() {
   const earningsChange = 0.016; // +1.6%
 
   return (
-    <div className="space-y-6 w-full">
+    <div className="space-y-6 w-full max-w-screen mx-auto">
       <p className="text-sm text-muted-foreground">Manage your affiliate program and track performance.</p>
       {/* Top Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 w-full">
         {/* Top Sold Products */}
-        <Card>
+        <Card className="w-full min-h-[280px]">
           <CardHeader>
             <CardTitle className="text-base">Top Sold Products</CardTitle>
           </CardHeader>
-          <CardContent className="px-6 pb-4">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Product Name</TableHead>
-                  <TableHead>Total Units Sold</TableHead>
-                  <TableHead>Revenue</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {topProducts.map((prod) => (
-                  <TableRow key={prod.name}>
-                    <TableCell>{prod.name}</TableCell>
-                    <TableCell>{prod.units.toLocaleString()}</TableCell>
-                    <TableCell>
-                      ₹{prod.revenue.toLocaleString()}
-                    </TableCell>
+          <CardContent className="px-2 sm:px-4 md:px-6 pb-4">
+            <div className="overflow-x-auto w-full min-w-[300px]">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product Name</TableHead>
+                    <TableHead>Total Units Sold</TableHead>
+                    <TableHead>Revenue</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {topProducts.map((prod) => (
+                    <TableRow key={prod.name}>
+                      <TableCell>{prod.name}</TableCell>
+                      <TableCell>{prod.units.toLocaleString()}</TableCell>
+                      <TableCell>
+                        ₹{prod.revenue.toLocaleString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
         {/* Total Earnings */}
-        <Card>
+        <Card className="w-full min-h-[280px]">
           <CardHeader className="flex flex-row items-center justify-between">
             <div className="w-full flex flex-col items-center">
               <CardTitle className="text-base">Total Earnings</CardTitle>
@@ -131,14 +133,14 @@ export default function Affiliate() {
               <img
                 src={svg1158}
                 alt="Earnings Illustration"
-                className="w-60 h-40 object-contain mt-4 hidden md:block"
+                className="w-40 h-30 md:w-60 md:h-40 object-contain mt-4 mx-auto"
               />
             </div>
           </CardHeader>
         </Card>
         {/* Target Card */}
-        <Card>
-          <CardHeader className="flex flex-col items-center justify-center text-center h-full">
+        <Card className="flex h-full w-full min-h-[280px]">
+          <CardHeader className="flex flex-1 flex-col items-center justify-center text-center h-full w-full">
             <Target className="w-8 h-8 text-[#A32035] mb-2" />
             <CardTitle className="text-base mb-1">Set your Sales Target</CardTitle>
             <CardDescription>
@@ -146,11 +148,11 @@ export default function Affiliate() {
             </CardDescription>
             <Dialog open={targetDialogOpen} onOpenChange={setTargetDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="mt-4 bg-[#A32035] hover:bg-[#8a1a2b] text-white font-medium rounded-md px-4 py-2 text-sm">
+                <Button className="mt-4 bg-[#A32035] hover:bg-[#8a1a2b] text-white font-medium rounded-md px-4 py-2 text-sm w-full max-w-xs">
                   Set Target Now
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="w-full max-w-xs sm:max-w-md">
                 <DialogHeader>
                   <DialogTitle>Set Your Sales Target</DialogTitle>
                   <DialogDescription>
@@ -159,10 +161,10 @@ export default function Affiliate() {
                 </DialogHeader>
                 <div className="space-y-4 py-2">
                   <Label htmlFor="target">Target Amount (₹)</Label>
-                  <Input id="target" type="number" placeholder="Enter amount" />
+                  <Input id="target" type="number" placeholder="Enter amount" className="w-full" />
                 </div>
                 <DialogFooter>
-                  <Button onClick={() => setTargetDialogOpen(false)} type="submit" className="bg-[#A32035] hover:bg-[#8a1a2b] text-white font-medium rounded-md px-4 py-2 text-sm">
+                  <Button onClick={() => setTargetDialogOpen(false)} type="submit" className="bg-[#A32035] hover:bg-[#8a1a2b] text-white font-medium rounded-md px-4 py-2 text-sm w-full">
                     Save Target
                   </Button>
                 </DialogFooter>
@@ -173,10 +175,10 @@ export default function Affiliate() {
       </div>
 
       {/* Purchases Table */}
-      <div className="bg-white rounded-xl border shadow-sm p-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+      <div className="bg-white rounded-xl border shadow-sm p-2 sm:p-4 md:p-6 w-full overflow-x-auto">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4 w-full">
           <h2 className="font-semibold text-lg text-foreground">Purchases</h2>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full md:w-auto">
             <Input
               placeholder="Filter by customer or product..."
               value={filter}
@@ -184,42 +186,44 @@ export default function Affiliate() {
                 setPage(1);
                 setFilter(e.target.value);
               }}
-              className="w-64"
+              className="w-full md:w-64"
             />
           </div>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>#</TableHead>
-              <TableHead>Customer Name</TableHead>
-              <TableHead>Product</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Purchase Amount</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedPurchases.length === 0 ? (
+        <div className="overflow-x-auto w-full min-w-[300px]">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                  No purchases found.
-                </TableCell>
+                <TableHead>#</TableHead>
+                <TableHead>Customer Name</TableHead>
+                <TableHead>Product</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Purchase Amount</TableHead>
               </TableRow>
-            ) : (
-              paginatedPurchases.map((purchase, idx) => (
-                <TableRow key={purchase.id}>
-                  <TableCell>{(page - 1) * PAGE_SIZE + idx + 1}</TableCell>
-                  <TableCell>{purchase.customer}</TableCell>
-                  <TableCell>{purchase.product}</TableCell>
-                  <TableCell>{purchase.date}</TableCell>
-                  <TableCell>₹{purchase.amount.toLocaleString()}</TableCell>
+            </TableHeader>
+            <TableBody>
+              {paginatedPurchases.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                    No purchases found.
+                  </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                paginatedPurchases.map((purchase, idx) => (
+                  <TableRow key={purchase.id}>
+                    <TableCell>{(page - 1) * PAGE_SIZE + idx + 1}</TableCell>
+                    <TableCell>{purchase.customer}</TableCell>
+                    <TableCell>{purchase.product}</TableCell>
+                    <TableCell>{purchase.date}</TableCell>
+                    <TableCell>₹{purchase.amount.toLocaleString()}</TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
         {/* Pagination */}
-        <div className="mt-4 flex justify-end">
+        <div className="mt-4 flex justify-end w-full">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
