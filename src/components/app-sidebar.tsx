@@ -27,7 +27,7 @@ export function AppSidebar({ user }: { user: any }) {
       icon: BarChart,
     },
     {
-      title: "Coupon",
+      title: "Redeem Coupons",
       url: "/coupon",
       icon: Gift,
     },

@@ -75,7 +75,7 @@ function App() {
     return (
       <div className="h-screen flex flex-col justify-center items-center bg-[#f3f5f9] font-[Segoe UI] text-[1.1rem] text-[#333]">
         <div className="w-10 h-10 border-4 border-gray-300 border-t-[#9F1D35] rounded-full animate-spin mb-4" />
-        <p><strong>Loading your Dashboard!</strong></p>
+        <p><strong>Just a moment, we're getting your dashboard ready!</strong></p>
       </div>
     );
   }

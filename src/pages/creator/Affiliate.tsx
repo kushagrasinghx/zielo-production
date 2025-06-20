@@ -139,8 +139,8 @@ export default function Affiliate() {
           </CardHeader>
         </Card>
         {/* Target Card */}
-        <Card className="flex h-full w-full min-h-[280px]">
-          <CardHeader className="flex flex-1 flex-col items-center justify-center text-center h-full w-full">
+        <Card className="flex h-full w-full min-h-[280px] items-center justify-center">
+          <CardHeader className="flex flex-1 flex-col items-center justify-center text-center h-full w-full max-w-[350px]">
             <Target className="w-8 h-8 text-[#A32035] mb-2" />
             <CardTitle className="text-base mb-1">Set your Sales Target</CardTitle>
             <CardDescription>
@@ -148,7 +148,9 @@ export default function Affiliate() {
             </CardDescription>
             <Dialog open={targetDialogOpen} onOpenChange={setTargetDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="mt-4 bg-[#A32035] hover:bg-[#8a1a2b] text-white font-medium rounded-md px-4 py-2 text-sm w-full max-w-xs">
+                <Button
+                  className="mt-4 bg-[#FCE9EC] text-[#A32035] border border-[#F8BFC8] font-medium rounded-md px-4 py-2 text-sm w-full max-w-xs hover:bg-[#f8d4db] transition-colors"
+                >
                   Set Target Now
                 </Button>
               </DialogTrigger>
