@@ -11,19 +11,44 @@ interface BrandOnboardingProps {
 const BrandOnboarding: React.FC<BrandOnboardingProps> = ({ onBackToTypeSelect, onComplete }) => {
   const [step, setStep] = useState(1);
   const [website, setWebsite] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [info, setInfo] = useState({ logo: '', banner: '', bio: '', socials: { insta: '', fb: '', twitter: '', youtube: '' } });
   const [logoFile, setLogoFile] = useState<string | null>(null);
   const [bannerFile, setBannerFile] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState('');
 
-  const handleNext = () => {
-    if (!website) {
-      setError('Please enter your brand website.');
+  const categories = [
+    { label: 'Beauty', emoji: '💄' },
+    { label: 'Fashion', emoji: '👗' },
+    { label: 'Fitness', emoji: '🏋️' },
+    { label: 'Technology', emoji: '💻' },
+    { label: 'Food & Beverage', emoji: '🍔' },
+    { label: 'Travel', emoji: '✈️' },
+    { label: 'Health', emoji: '🩺' },
+    { label: 'Home', emoji: '🏠' },
+    { label: 'Education', emoji: '🎓' },
+    { label: 'Entertainment', emoji: '🎬' },
+    { label: 'Sports', emoji: '⚽' },
+    { label: 'Finance', emoji: '💰' },
+    { label: 'Other', emoji: '✨' },
+  ];
+
+  const handleCategoryChange = (categoryLabel: string) => {
+    setSelectedCategories(prev =>
+      prev.includes(categoryLabel)
+        ? prev.filter(c => c !== categoryLabel)
+        : [...prev, categoryLabel]
+    );
+  };
+
+  const handleCategoryNext = () => {
+    if (selectedCategories.length < 2) {
+      setError('Please select at least 2 categories.');
       return;
     }
     setError('');
-    setStep(2);
+    setStep(3);
   };
 
   const handleDone = () => {
@@ -66,14 +91,57 @@ const BrandOnboarding: React.FC<BrandOnboardingProps> = ({ onBackToTypeSelect, o
           {error && <div className="text-red-500 text-xs mt-1">{error}</div>}
           <div className="flex gap-2 mt-2">
             <Button variant="outline" size="sm" className="text-xs px-3 py-1.5" onClick={onBackToTypeSelect}>Back</Button>
-            <Button size="sm" className="text-xs px-3 py-1.5" onClick={handleNext}>Next</Button>
+            <Button size="sm" className="text-xs px-3 py-1.5" onClick={() => {
+              if (!website) {
+                setError('Please enter your brand website.');
+                return;
+              }
+              setError('');
+              setStep(2);
+            }}>Next</Button>
           </div>
         </div>
       )}
       {step === 2 && (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex flex-col gap-3">
+          <h2 className="text-base font-semibold mb-1">Select Brand Niche Categories</h2>
+          <p className="text-muted-foreground text-xs mb-2">Choose at least 2 categories that best describe your brand.</p>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {categories.map(category => (
+              <button
+                type="button"
+                key={category.label}
+                className={`px-3 py-1.5 rounded-full border text-xs transition ${selectedCategories.includes(category.label) ? 'bg-black text-white border-black' : 'bg-muted text-muted-foreground border-gray-300'}`}
+                onClick={() => handleCategoryChange(category.label)}
+              >
+                <span className="mr-1">{category.emoji}</span>{category.label}
+              </button>
+            ))}
+          </div>
+          {error && <div className="text-red-500 text-xs mt-1">{error}</div>}
+          <div className="flex gap-2 mt-2">
+            <Button variant="outline" size="sm" className="text-xs px-3 py-1.5" onClick={() => setStep(1)}>Back</Button>
+            <Button size="sm" className="text-xs px-3 py-1.5" onClick={handleCategoryNext}>Next</Button>
+          </div>
+        </div>
+      )}
+      {step === 3 && (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex flex-col gap-3">
           <h2 className="text-base font-semibold mb-1">Brand Info</h2>
           <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium mb-1">Selected Categories</label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {selectedCategories.map(categoryLabel => {
+                  const cat = categories.find(c => c.label === categoryLabel);
+                  return (
+                    <span key={categoryLabel} className="px-3 py-1.5 rounded-full border text-xs bg-muted text-muted-foreground border-gray-300">
+                      <span className="mr-1">{cat?.emoji}</span>{categoryLabel}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium mb-1">Logo</label>
               <label className="w-16 h-16 flex items-center justify-center border-2 border-dashed rounded-lg cursor-pointer relative bg-muted hover:bg-gray-100">
@@ -119,7 +187,7 @@ const BrandOnboarding: React.FC<BrandOnboardingProps> = ({ onBackToTypeSelect, o
             </div>
           </div>
           <div className="flex gap-2 mt-2">
-            <Button variant="outline" size="sm" className="text-xs px-3 py-1.5" onClick={() => setStep(1)}>Back</Button>
+            <Button variant="outline" size="sm" className="text-xs px-3 py-1.5" onClick={() => setStep(2)}>Back</Button>
             {!editing ? (
               <Button variant="secondary" size="sm" className="text-xs px-3 py-1.5" onClick={() => setEditing(true)}>Edit Details</Button>
             ) : (

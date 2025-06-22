@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Star, Upload, FileText, Image, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter as DialogFooterUI, DialogDescription } from '@/components/ui/dialog';
-import type { Brand } from '@/data/types';
+import type { Brand, Campaign } from '@/data/types';
 
 // Mock status assignment for demo (in real app, this would come from backend/user data)
 const statusMap = [
@@ -23,10 +23,21 @@ const statusAssignments = brands.reduce((acc, brand, idx) => {
   return acc;
 }, {} as Record<string, typeof brands>);
 
+// Helper function to determine content type from campaign type
+const getContentTypeFromCampaign = (campaignType: string): 'image' | 'video' | 'text' => {
+  const type = campaignType.toLowerCase();
+  if (type.includes('video') || type.includes('reel') || type.includes('tiktok') || type.includes('youtube')) {
+    return 'video';
+  } else if (type.includes('story') || type.includes('post') || type.includes('carousel')) {
+    return 'image';
+  } else {
+    return 'text';
+  }
+};
+
 const initialUploadData = {
   title: '',
-  description: '',
-  contentType: 'image',
+  contentType: 'image' as 'image' | 'video' | 'text',
   file: null,
   url: '',
   uploadMethod: 'file',
@@ -35,19 +46,27 @@ const initialUploadData = {
 export default function CollaborationStatus() {
   const [showUploadPopup, setShowUploadPopup] = useState(false);
   const [uploadBrand, setUploadBrand] = useState<Brand | null>(null);
+  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [uploadMode, setUploadMode] = useState<'submit' | 'resubmit'>('submit');
   const [customUploadData, setCustomUploadData] = useState(initialUploadData);
 
-  const openUploadPopup = (brand: Brand, mode: 'submit' | 'resubmit') => {
+  const openUploadPopup = (brand: Brand, campaign: Campaign, mode: 'submit' | 'resubmit') => {
     setUploadBrand(brand);
+    setSelectedCampaign(campaign);
     setUploadMode(mode);
     setShowUploadPopup(true);
-    setCustomUploadData(initialUploadData);
+    const contentType = getContentTypeFromCampaign(campaign.type);
+    setCustomUploadData({
+      ...initialUploadData,
+      title: campaign.title,
+      contentType
+    });
   };
 
   const closeUploadPopup = () => {
     setShowUploadPopup(false);
     setUploadBrand(null);
+    setSelectedCampaign(null);
     setCustomUploadData(initialUploadData);
   };
 
@@ -109,7 +128,13 @@ export default function CollaborationStatus() {
                   {status.key === 'pending' && (
                     <div className="flex gap-2 px-4 pb-4 pt-0">
                       <Button size="sm" className="flex-1 bg-[#fbeaec] text-[#9F1D35] font-medium text-xs border border-[#f3cdd3] hover:bg-[#fad7df] py-1.5 px-2">Archive</Button>
-                      <Button size="sm" className="flex-1 bg-[#9F1D35] text-white hover:bg-[#8a1a2e] text-xs py-1.5 px-2" onClick={() => openUploadPopup(brand, 'submit')}>Submit</Button>
+                      <Button 
+                        size="sm" 
+                        className="flex-1 bg-[#9F1D35] text-white hover:bg-[#8a1a2e] text-xs py-1.5 px-2" 
+                        onClick={() => brand.campaigns && brand.campaigns[0] && openUploadPopup(brand, brand.campaigns[0], 'submit')}
+                      >
+                        Submit
+                      </Button>
                     </div>
                   )}
                   {status.key === 'archived' && (
@@ -119,7 +144,13 @@ export default function CollaborationStatus() {
                   )}
                   {status.key === 'rejected' && (
                     <div className="flex gap-2 px-4 pb-4 pt-0">
-                      <Button size="sm" className="flex-1 bg-[#fbeaec] text-[#9F1D35] font-medium text-xs border border-[#f3cdd3] hover:bg-[#fad7df] py-1.5 px-2" onClick={() => openUploadPopup(brand, 'resubmit')}>Resubmit</Button>
+                      <Button 
+                        size="sm" 
+                        className="flex-1 bg-[#fbeaec] text-[#9F1D35] font-medium text-xs border border-[#f3cdd3] hover:bg-[#fad7df] py-1.5 px-2" 
+                        onClick={() => brand.campaigns && brand.campaigns[0] && openUploadPopup(brand, brand.campaigns[0], 'resubmit')}
+                      >
+                        Resubmit
+                      </Button>
                     </div>
                   )}
                 </Card>
@@ -138,7 +169,7 @@ export default function CollaborationStatus() {
           <DialogHeader>
             <DialogTitle>{uploadMode === 'submit' ? 'Submit Content' : 'Resubmit Content'}</DialogTitle>
             <DialogDescription>
-              Fill in the details to {uploadMode === 'submit' ? 'submit' : 'resubmit'} your content for <span className="font-semibold text-[#9F1D35]">{uploadBrand?.name}</span>.
+              {uploadMode === 'submit' ? 'Submit' : 'Resubmit'} your content for <span className="font-semibold text-[#9F1D35]">{uploadBrand?.name}</span> campaign.
             </DialogDescription>
           </DialogHeader>
 
@@ -148,51 +179,65 @@ export default function CollaborationStatus() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Content Title</label>
               <input
                 type="text"
-                placeholder={`e.g., My collaboration with ${uploadBrand?.name || ''}`}
+                placeholder="Enter your content title..."
                 value={customUploadData.title}
                 onChange={e => handleCustomUploadChange('title', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9F1D35] focus:border-transparent text-sm"
               />
             </div>
 
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-              <textarea
-                rows={4}
-                placeholder="Describe your content and how it relates to the brand..."
-                value={customUploadData.description}
-                onChange={e => handleCustomUploadChange('description', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9F1D35] focus:border-transparent resize-none text-sm"
-              />
-            </div>
-
-            {/* Content Type */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Content Type</label>
-              <div className="flex gap-4">
-                {[
-                  { value: 'image', label: 'Image', icon: <Image size={16} /> },
-                  { value: 'video', label: 'Video', icon: <Video size={16} /> },
-                  { value: 'text', label: 'Text Post', icon: <FileText size={16} /> }
-                ].map((type) => (
-                  <label key={type.value} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="contentType"
-                      value={type.value}
-                      checked={customUploadData.contentType === type.value}
-                      onChange={e => handleCustomUploadChange('contentType', e.target.value)}
-                      className="w-4 h-4 text-[#9F1D35] focus:ring-[#9F1D35]"
-                    />
-                    <div className="flex items-center gap-1">
-                      {type.icon}
-                      <span className="text-sm text-gray-700">{type.label}</span>
-                    </div>
-                  </label>
-                ))}
+            {/* Campaign Guidelines */}
+            {selectedCampaign && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Campaign Guidelines</label>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="text-sm font-medium text-blue-900 mb-2">Requirements</h4>
+                  <ul className="text-xs text-blue-800 space-y-1 mb-3">
+                    {selectedCampaign.requirements.map((req, idx) => (
+                      <li key={idx}>• {req}</li>
+                    ))}
+                  </ul>
+                  <h4 className="text-sm font-medium text-blue-900 mb-2">Guidelines</h4>
+                  <ul className="text-xs text-blue-800 space-y-1">
+                    {selectedCampaign.guidelines.map((guideline, idx) => (
+                      <li key={idx}>• {guideline}</li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Content Type (Auto-selected based on campaign) */}
+            {selectedCampaign && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">Content Type</label>
+                <div className="flex gap-4">
+                  {[
+                    { value: 'image', label: 'Image', icon: <Image size={16} /> },
+                    { value: 'video', label: 'Video', icon: <Video size={16} /> },
+                    { value: 'text', label: 'Text Post', icon: <FileText size={16} /> }
+                  ].map((type) => (
+                    <label key={type.value} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="contentType"
+                        value={type.value}
+                        checked={customUploadData.contentType === type.value}
+                        onChange={e => handleCustomUploadChange('contentType', e.target.value)}
+                        className="w-4 h-4 text-[#9F1D35] focus:ring-[#9F1D35]"
+                      />
+                      <div className="flex items-center gap-1">
+                        {type.icon}
+                        <span className="text-sm text-gray-700">{type.label}</span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Auto-selected based on campaign type: <span className="font-medium">{selectedCampaign.type}</span>
+                </p>
+              </div>
+            )}
 
             {/* Upload Method */}
             <div>
@@ -242,18 +287,6 @@ export default function CollaborationStatus() {
                 />
               )}
             </div>
-
-            {/* Guidelines */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-blue-900 mb-2">Content Guidelines</h4>
-              <ul className="text-xs text-blue-800 space-y-1">
-                <li>• Ensure content aligns with {uploadBrand?.name}'s brand values</li>
-                <li>• Include clear product visibility if featuring brand products</li>
-                <li>• Use authentic, high-quality visuals</li>
-                <li>• Follow platform-specific best practices</li>
-                <li>• Disclose any brand partnerships appropriately</li>
-              </ul>
-            </div>
           </div>
 
           <DialogFooterUI className="flex gap-3 sm:gap-3">
@@ -266,7 +299,7 @@ export default function CollaborationStatus() {
             </Button>
             <Button
               onClick={handleCustomUploadSubmit}
-              disabled={!customUploadData.title || !customUploadData.description}
+              disabled={!customUploadData.title}
               className="flex-1 bg-[#9F1D35] text-white py-1.5 px-3 rounded-lg font-medium hover:bg-[#8a1a2e] transition-colors text-xs disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
               Submit

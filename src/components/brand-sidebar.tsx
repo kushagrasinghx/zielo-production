@@ -22,12 +22,12 @@ export function BrandSidebar({ user }: { user: any }) {
       isActive: (pathname: string) => pathname === '/' || pathname === '/brand-dashboard',
     },
     {
-      title: "Campaigns",
+      title: "Your Campaigns",
       url: "/brand-campaigns",
       icon: Briefcase,
     },
     {
-      title: "Analytics",
+      title: "Brand Analytics",
       url: "/brand-analytics",
       icon: BarChart,
     },
@@ -37,12 +37,12 @@ export function BrandSidebar({ user }: { user: any }) {
       icon: Shuffle,
     },
     {
-      title: "Affiliate",
+      title: "Affiliates",
       url: "/brand-affiliate",
       icon: Link2,
     },
     {
-      title: "Wallet",
+      title: "Brand Wallet",
       url: "/brand-wallet",
       icon: Wallet,
     },
