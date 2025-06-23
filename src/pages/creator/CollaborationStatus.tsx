@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { brands } from '@/data/brands';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Star, Upload, FileText, Image, Video } from 'lucide-react';
+import { Star, Upload, FileText, Image, Video, Bookmark, BookmarkCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter as DialogFooterUI, DialogDescription } from '@/components/ui/dialog';
 import type { Brand, Campaign } from '@/data/types';
@@ -49,6 +49,71 @@ export default function CollaborationStatus() {
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [uploadMode, setUploadMode] = useState<'submit' | 'resubmit'>('submit');
   const [customUploadData, setCustomUploadData] = useState(initialUploadData);
+  const [showSavedDialog, setShowSavedDialog] = useState(false);
+  const [savedCampaigns, setSavedCampaigns] = useState<{ brand: Brand; campaign: Campaign }[]>([
+    // Example 1: EverEm Skincare - Product Demo for New Moisturizer
+    {
+      brand: {
+        name: "EverEm Skincare",
+        description: "EverEm Skincare offers premium, natural skincare products for all skin types.",
+        rating: 4.8,
+        categories: ["Beauty", "Skincare"],
+        activeCampaigns: 3,
+        imageUrl: "https://example.com/logo-everem.png",
+        logo: "https://example.com/logo-everem.png",
+        brandStory: "Born from a passion for natural beauty.",
+        brandVoice: "Professional and nurturing.",
+        targetAudience: "Skincare enthusiasts aged 25-45",
+        campaigns: [],
+        ugcPortfolio: []
+      },
+      campaign: {
+        id: 1,
+        title: "Product Demo for New Moisturizer",
+        type: "Instagram Reel",
+        category: "Product Gifting",
+        niche: "Beauty",
+        rating: 4.7,
+        description: "Create a demo of our new moisturizer.",
+        deadline: "8/15/2023",
+        creatorsNeeded: 5,
+        requirements: ["Use #EverEmGlow", "Tag @everem"],
+        guidelines: ["Show before/after", "Explain benefits"],
+        coins: 250
+      }
+    },
+    // Example 2: GlowMore - Eco-Friendly Makeup Tutorial
+    {
+      brand: {
+        name: "GlowMore",
+        description: "GlowMore provides eco-friendly makeup products for conscious beauty lovers.",
+        rating: 4.5,
+        categories: ["Beauty", "Makeup"],
+        activeCampaigns: 2,
+        imageUrl: undefined,
+        logo: "https://example.com/logo-glowmore.png",
+        brandStory: "Making beauty sustainable.",
+        brandVoice: "Eco-conscious and trendy.",
+        targetAudience: "Environmentally conscious beauty enthusiasts",
+        campaigns: [],
+        ugcPortfolio: []
+      },
+      campaign: {
+        id: 1,
+        title: "Eco-Friendly Makeup Tutorial",
+        type: "YouTube Video",
+        category: "Paid Campaign",
+        niche: "Beauty",
+        rating: 4.6,
+        description: "Create a tutorial using our products.",
+        deadline: "8/18/2023",
+        creatorsNeeded: 3,
+        requirements: ["Use #GlowMoreEco", "Tag @glowmore"],
+        guidelines: ["Show application", "Highlight eco-features"],
+        coins: 300
+      }
+    }
+  ]);
 
   const openUploadPopup = (brand: Brand, campaign: Campaign, mode: 'submit' | 'resubmit') => {
     setUploadBrand(brand);
@@ -79,13 +144,49 @@ export default function CollaborationStatus() {
     closeUploadPopup();
   };
 
+  // Helper to check if a campaign is saved
+  const isCampaignSaved = (brand: Brand, campaign: Campaign) => {
+    return savedCampaigns.some(
+      (item) => item.brand.name === brand.name && item.campaign.title === campaign.title
+    );
+  };
+
+  // Toggle save/unsave
+  const toggleSaveCampaign = (brand: Brand, campaign: Campaign) => {
+    setSavedCampaigns((prev) => {
+      const exists = prev.some(
+        (item) => item.brand.name === brand.name && item.campaign.title === campaign.title
+      );
+      if (exists) {
+        return prev.filter(
+          (item) => !(item.brand.name === brand.name && item.campaign.title === campaign.title)
+        );
+      } else {
+        return [...prev, { brand, campaign }];
+      }
+    });
+  };
+
   return (
     <div className="space-y-6 w-full">
       <div>
-          <p className="text-sm text-muted-foreground">
-            View and manage your brand collaborations by status.
-          </p>
-        </div>
+        <p className="text-sm text-muted-foreground">
+          View and manage your brand collaborations by status.
+        </p>
+      </div>
+      <div className="mb-2">
+        <Button
+          variant="outline"
+          className="flex items-center gap-2 border border-gray-300 text-gray-700 py-1 px-2 rounded-lg font-medium hover:bg-gray-50 transition-colors text-xs"
+          onClick={() => setShowSavedDialog(true)}
+        >
+          <Bookmark className="w-4 h-4" />
+          Saved for Later
+          {savedCampaigns.length > 0 && (
+            <span className="ml-1 bg-[#9F1D35] text-white rounded-full px-2 py-0.5 text-xs">{savedCampaigns.length}</span>
+          )}
+        </Button>
+      </div>
       <div className="grid w-full gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {statusMap.map((status) => (
           <div key={status.key} className="flex flex-col min-w-0">
@@ -95,6 +196,20 @@ export default function CollaborationStatus() {
             <div className="flex flex-col gap-4">
               {statusAssignments[status.key]?.map((brand, idx) => (
                 <Card key={brand.name + idx} className="relative p-0 overflow-visible border border-[#e2e8f0] bg-white rounded-2xl w-full flex flex-col justify-between">
+                  {/* Save for later button (top right corner) */}
+                  {brand.campaigns?.length && brand.campaigns.length > 0 && (
+                    <button
+                      className="absolute top-2 right-2 z-10 bg-white rounded-full p-1 border border-gray-200 hover:bg-gray-100"
+                      title={brand.campaigns?.[0] && isCampaignSaved(brand, brand.campaigns?.[0]) ? 'Unsave' : 'Save for later'}
+                      onClick={() => brand.campaigns?.[0] && toggleSaveCampaign(brand, brand.campaigns?.[0])}
+                    >
+                      {brand.campaigns?.[0] && isCampaignSaved(brand, brand.campaigns?.[0]) ? (
+                        <BookmarkCheck className="w-5 h-5 text-[#9F1D35]" />
+                      ) : (
+                        <Bookmark className="w-5 h-5 text-gray-400" />
+                      )}
+                    </button>
+                  )}
                   <div>
                     <div className="flex items-center gap-3 px-4 pt-4 pb-2">
                       <div className="w-8 h-8 bg-[#f3f5f9] rounded-full flex items-center justify-center border border-[#e2e8f0] overflow-hidden">
@@ -303,6 +418,76 @@ export default function CollaborationStatus() {
               className="flex-1 bg-[#9F1D35] text-white py-1.5 px-3 rounded-lg font-medium hover:bg-[#8a1a2e] transition-colors text-xs disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
               Submit
+            </Button>
+          </DialogFooterUI>
+        </DialogContent>
+      </Dialog>
+
+      {/* Saved for Later Dialog */}
+      <Dialog open={showSavedDialog} onOpenChange={setShowSavedDialog}>
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Saved for Later</DialogTitle>
+            <DialogDescription>
+              View all campaigns you have saved for later.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {savedCampaigns.length === 0 ? (
+              <div className="text-center text-gray-400 text-sm py-6">No saved campaigns yet.</div>
+            ) : (
+              savedCampaigns.map(({ brand, campaign }, idx) => (
+                <Card key={brand.name + campaign.title + idx} className="flex flex-col gap-2 p-4 border border-[#e2e8f0] bg-white rounded-2xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-[#f3f5f9] rounded-full flex items-center justify-center border border-[#e2e8f0] overflow-hidden">
+                      {brand.logo ? (
+                        <img src={brand.logo} alt={brand.name} className="object-cover w-full h-full" />
+                      ) : (
+                        <span className="text-xs font-semibold text-gray-400">{brand.name[0]}</span>
+                      )}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-xs leading-tight mb-0 text-gray-900">{brand.name}</div>
+                      <div className="text-xs text-gray-500">{campaign.title}</div>
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-700 mb-2 line-clamp-3 min-h-[32px]">{brand.description}</div>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {brand.categories.map((cat) => (
+                      <span key={cat} className="bg-[#fbeaec] text-[#9F1D35] font-medium text-xs px-2 rounded-lg border border-[#f3cdd3]">{cat}</span>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      className="bg-[#9F1D35] text-white text-xs py-1 px-2 rounded-lg hover:bg-[#8a1a2e]"
+                      onClick={() => {
+                        setShowSavedDialog(false);
+                        openUploadPopup(brand, campaign, 'submit');
+                      }}
+                    >
+                      Submit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-xs py-1 px-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                      onClick={() => toggleSaveCampaign(brand, campaign)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </Card>
+              ))
+            )}
+          </div>
+          <DialogFooterUI className="flex gap-3 sm:gap-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowSavedDialog(false)}
+              className="flex-1 border border-gray-300 text-gray-700 py-1.5 px-3 rounded-lg font-medium hover:bg-gray-50 transition-colors text-xs"
+            >
+              Close
             </Button>
           </DialogFooterUI>
         </DialogContent>

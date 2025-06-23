@@ -24,10 +24,6 @@ export function SearchAndFilter({
           onChange={(e) => onSearchChange(e.target.value)}
           className="h-9 pl-3 pr-16 text-sm rounded-md bg-muted border border-border placeholder:text-muted-foreground focus-visible:ring-0"
         />
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-1 text-xs text-muted-foreground border rounded px-1 py-0.5">
-          <kbd className="font-mono">Ctrl</kbd>
-          <kbd className="font-mono">K</kbd>
-        </div>
       </div>
 
       {/* Neutral Filter Button */}

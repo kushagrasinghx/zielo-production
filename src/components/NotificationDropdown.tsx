@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Bell, Check, X } from 'lucide-react';
+import { useState } from 'react';
+import { Bell } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { cn } from '@/lib/utils';
 
