@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Plus, Search, Filter, Calendar, Users, Eye, DollarSign, X, Edit3, Pause, Trash2, Copy } from 'lucide-react';
+import { Plus, Search, Filter, DollarSign, X, Edit3, Pause, Trash2, Copy } from 'lucide-react';
 import { FaInstagram, FaYoutube, FaTiktok } from 'react-icons/fa';
 import { brands } from '../../data/brands';
 import type { Campaign } from '../../data/types';
@@ -163,16 +163,16 @@ const BrandCampaigns: React.FC = () => {
       {
         accessorKey: 'status',
         header: 'Status',
-        cell: ({ row }) => (
+        cell: () => (
           <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-            {row.original.status}
+            Active
           </span>
         ),
       },
       {
         id: 'actions',
         header: 'Action',
-        cell: ({ row }) => (
+        cell: () => (
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" title="Edit">
               <Edit3 size={16} />
@@ -336,20 +336,13 @@ const BrandCampaigns: React.FC = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginatedCampaigns.map((row) => (
+                  table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id}>
-                      {columns.map((col, colIdx) => {
-                        if (typeof col.cell === 'function') {
-                          return (
-                            <TableCell key={colIdx}>
-                              {col.cell({ row: { original: row } } as any)}
-                            </TableCell>
-                          );
-                        }
-                        // @ts-ignore
-                        const value = col.accessorKey ? row[col.accessorKey] : '';
-                        return <TableCell key={colIdx}>{value}</TableCell>;
-                      })}
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
                     </TableRow>
                   ))
                 )}

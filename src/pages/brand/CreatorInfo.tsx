@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FaInstagram, FaFacebook, FaTiktok, FaYoutube } from 'react-icons/fa';
@@ -67,8 +67,7 @@ const ugcContent = [
 ];
 
 export default function CreatorInfo() {
-  const { brandName, campaignId, creatorName } = useParams();
-  const navigate = useNavigate();
+  const { brandName, campaignId } = useParams();
   const [activeTab, setActiveTab] = useState('profile');
 
   return (

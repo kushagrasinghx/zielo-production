@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { brands } from '../../data/brands';
 import { Card } from '@/components/ui/card';
@@ -24,25 +24,6 @@ const statCards = [
   { label: 'Estimated ROI', value: '4.7%', icon: <Calendar className="w-6 h-6 mx-auto mb-1" /> },
 ];
 
-const mockEngagements = [
-  { date: '3 May', value: 1.2 },
-  { date: '4 May', value: 1.8 },
-  { date: '5 May', value: 2.5 },
-  { date: '6 May', value: 3.1 },
-  { date: '7 May', value: 3.0 },
-  { date: '8 May', value: 3.7 },
-  { date: '9 May', value: 4.1 },
-  { date: '10 May', value: 4.3 },
-];
-const mockDemographics = [
-  { age: '13-17', percent: 6.7 },
-  { age: '18-24', percent: 8.2 },
-  { age: '25-34', percent: 20 },
-  { age: '35-44', percent: 31.2 },
-  { age: '45-54', percent: 22.8 },
-  { age: '55-64', percent: 16.8 },
-  { age: '65+', percent: 8.6 },
-];
 const mockCreators = [
   { name: 'Kathryn Murphy', img: '', verified: true, campaigns: 12, followers: '1.2M', engagement: 72, status: 'Accepted' },
   { name: 'Floyd Miles', img: '', verified: true, campaigns: 3, followers: '12K', engagement: 54, status: 'Accepted' },
@@ -359,7 +340,7 @@ export default function CampaignAnalytics() {
                 </tr>
               </thead>
               <tbody>
-                {paginatedCreators.map((creator, idx) => (
+                {paginatedCreators.map((creator) => (
                   <tr key={creator.name} className="border-b last:border-0">
                     <td className="py-3 px-6 flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 border border-gray-200">
