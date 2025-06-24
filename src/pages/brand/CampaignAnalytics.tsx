@@ -4,6 +4,12 @@ import { brands } from '../../data/brands';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Users, Eye, TrendingUp, Calendar, DollarSign, CheckCircle, XCircle, Clock } from 'lucide-react';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+} from '@/components/ui/pagination';
+import { buttonVariants } from '@/components/ui/button';
 
 const statCards = [
   { label: 'Total Reach', value: '2.3M', icon: <Eye className="w-6 h-6 mx-auto mb-1" /> },
@@ -294,24 +300,46 @@ export default function CampaignAnalytics() {
               </tbody>
             </table>
             {/* Pagination */}
-            <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-gray-100">
-              <Button variant="ghost" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
-                ← Back
-              </Button>
-              {Array.from({ length: pageCount }, (_, i) => (
-                <Button
-                  key={i}
-                  variant={page === i + 1 ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setPage(i + 1)}
-                >
-                  {i + 1}
-                </Button>
-              ))}
-              <Button variant="ghost" size="sm" onClick={() => setPage(p => Math.min(pageCount, p + 1))} disabled={page === pageCount}>
-                Next →
-              </Button>
-            </div>
+            <Pagination className="px-6 py-4 border-t border-gray-100 justify-end">
+              <PaginationContent>
+                <PaginationItem>
+                  <button
+                    type="button"
+                    className={buttonVariants({ variant: page === 1 ? 'ghost' : 'outline', size: 'default' }) + ' gap-1 px-2.5 sm:pl-2.5'}
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    aria-label="Go to previous page"
+                  >
+                    <span className="sr-only">Previous</span>
+                    <span aria-hidden="true">&larr;</span>
+                  </button>
+                </PaginationItem>
+                {Array.from({ length: pageCount }, (_, i) => (
+                  <PaginationItem key={i}>
+                    <button
+                      type="button"
+                      className={buttonVariants({ variant: page === i + 1 ? 'outline' : 'ghost', size: 'icon' })}
+                      aria-current={page === i + 1 ? 'page' : undefined}
+                      onClick={() => setPage(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <button
+                    type="button"
+                    className={buttonVariants({ variant: page === pageCount ? 'ghost' : 'outline', size: 'default' }) + ' gap-1 px-2.5 sm:pr-2.5'}
+                    onClick={() => setPage(p => Math.min(pageCount, p + 1))}
+                    disabled={page === pageCount}
+                    aria-label="Go to next page"
+                  >
+                    <span className="sr-only">Next</span>
+                    <span aria-hidden="true">&rarr;</span>
+                  </button>
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </Card>
         </div>
       )}

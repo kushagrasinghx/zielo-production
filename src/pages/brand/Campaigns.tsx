@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Plus, Search, Filter, Calendar, Users, Eye, DollarSign, X, Edit3, Pause, Trash2, Copy } from 'lucide-react';
+import { FaInstagram, FaYoutube, FaTiktok } from 'react-icons/fa';
 import { brands } from '../../data/brands';
 import type { Campaign } from '../../data/types';
 import { Button } from '@/components/ui/button';
@@ -19,25 +20,19 @@ import { useNavigate } from 'react-router-dom';
 const getFormatIcon = (format: string) => {
   switch (format) {
     case 'Instagram Reel':
-    case 'Reels':
-      return (
-        <div className="w-3.5 h-3.5 bg-current rounded-full flex items-center justify-center">
-          <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M8 5v14l11-7z" />
-          </svg>
-        </div>
-      );
     case 'Instagram Post':
-    case 'Posts':
-      return <Eye size={14} />;
     case 'Instagram Story':
+    case 'Instagram Carousel':
+    case 'Reels':
+    case 'Posts':
     case 'Stories':
-      return <Users size={14} />;
+      return <FaInstagram color="#9F1D35" size={18} />;
     case 'YouTube Video':
     case 'YouTube Short':
+      return <FaYoutube color="#9F1D35" size={18} />;
     case 'TikTok Video':
     case 'TikTok':
-      return <Calendar size={14} />;
+      return <FaTiktok color="#9F1D35" size={18} />;
     default:
       return <DollarSign size={14} />;
   }
@@ -102,6 +97,12 @@ const BrandCampaigns: React.FC = () => {
       return matchesSearch;
     });
   }, [allCampaigns, searchQuery, filters]);
+
+  // Minimal pagination logic (must come after filteredCampaigns)
+  const [page, setPage] = useState(1);
+  const pageSize = 10; // or any number you want
+  const pageCount = Math.ceil(filteredCampaigns.length / pageSize);
+  const paginatedCampaigns = filteredCampaigns.slice((page - 1) * pageSize, page * pageSize);
 
   // DataTable columns
   const columns = useMemo<ColumnDef<Campaign & { brandName: string; status: string }>[]>(
@@ -325,54 +326,62 @@ const BrandCampaigns: React.FC = () => {
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows.length === 0 ? (
+                {paginatedCampaigns.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={columns.length} className="text-center text-muted-foreground py-8">
                       No campaigns found.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  table.getRowModel().rows.map((row) => (
+                  paginatedCampaigns.map((row) => (
                     <TableRow key={row.id}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                      ))}
+                      {columns.map((col, colIdx) => {
+                        if (typeof col.cell === 'function') {
+                          return (
+                            <TableCell key={colIdx}>
+                              {col.cell({ row: { original: row } } as any)}
+                            </TableCell>
+                          );
+                        }
+                        // @ts-ignore
+                        const value = col.accessorKey ? row[col.accessorKey] : '';
+                        return <TableCell key={colIdx}>{value}</TableCell>;
+                      })}
                     </TableRow>
                   ))
                 )}
               </TableBody>
             </Table>
           </div>
-          {/* Pagination */}
-          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
+          {/* Minimal Pagination */}
+          <div className="flex items-center justify-center gap-2 py-4">
+            <button
+              type="button"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-3 py-1 rounded border bg-white text-gray-700 disabled:opacity-50"
             >
-              ← Back
-            </Button>
-            <div className="flex gap-1">
-              {Array.from({ length: table.getPageCount() }, (_, i) => (
-                <Button
-                  key={i}
-                  variant={table.getState().pagination?.pageIndex === i ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => table.setPageIndex(i)}
-                >
-                  {i + 1}
-                </Button>
-              ))}
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
+              Previous
+            </button>
+            {Array.from({ length: pageCount }, (_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setPage(i + 1)}
+                aria-current={page === i + 1 ? 'page' : undefined}
+                className={`px-3 py-1 rounded border ${page === i + 1 ? 'bg-[#9F1D35] text-white' : 'bg-white text-gray-700'}`}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setPage(p => Math.min(pageCount, p + 1))}
+              disabled={page === pageCount}
+              className="px-3 py-1 rounded border bg-white text-gray-700 disabled:opacity-50"
             >
-              Next →
-            </Button>
+              Next
+            </button>
           </div>
         </div>
       </div>
