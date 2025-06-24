@@ -24,12 +24,13 @@ const Settings = lazy(() => import('./pages/creator/Settings'));
 // Lazy load brand pages
 const BrandDashboard = lazy(() => import('./pages/brand/BrandDashboard'));
 const BrandCampaigns = lazy(() => import('./pages/brand/Campaigns'));
-const BrandAnalytics = lazy(() => import('./pages/brand/Analytics'));
 const BrandBarter = lazy(() => import('./pages/brand/Barter'));
 const BrandAffiliate = lazy(() => import('./pages/brand/Affiliate'));
 const BrandWallet = lazy(() => import('./pages/brand/Wallet'));
 const BrandSettings = lazy(() => import('./pages/brand/Settings'));
 const CampaignAnalytics = lazy(() => import('./pages/brand/CampaignAnalytics'));
+const CreatorInfo = lazy(() => import('./pages/brand/CreatorInfo'));
+const NonCampaignFeed = lazy(() => import('./pages/brand/NonCampaignFeed'));
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -131,10 +132,12 @@ function App() {
                     <Route path="/brand-dashboard" element={<BrandDashboard />} />
                     <Route path="/brand/campaigns" element={<BrandCampaigns />} />
                     <Route path="/brand/campaigns/:brandName/:campaignId" element={<CampaignAnalytics />} />
+                    <Route path="/brand/campaigns/:brandName/:campaignId/creator/:creatorName" element={<CreatorInfo />} />
                     <Route path="/brand-barter" element={<BrandBarter />} />
                     <Route path="/brand-affiliate" element={<BrandAffiliate />} />
                     <Route path="/brand-wallet" element={<BrandWallet />} />
                     <Route path="/brand-settings" element={<BrandSettings />} />
+                    <Route path="/brand/non-campaign-feed" element={<NonCampaignFeed />} />
                     <Route path="*" element={<BrandDashboard />} />
                   </Routes>
                 </Suspense>

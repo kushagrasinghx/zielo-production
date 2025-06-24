@@ -10,6 +10,10 @@ import {
   PaginationItem,
 } from '@/components/ui/pagination';
 import { buttonVariants } from '@/components/ui/button';
+import { Bar, BarChart, CartesianGrid, XAxis, LabelList } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { FaInstagram, FaYoutube, FaTiktok, FaFacebook } from 'react-icons/fa';
 
 const statCards = [
   { label: 'Total Reach', value: '2.3M', icon: <Eye className="w-6 h-6 mx-auto mb-1" /> },
@@ -67,6 +71,118 @@ const slugify = (str: string) =>
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-');
 
+// Engagements chart data
+const engagementsChartData = [
+  { date: 'May 3', views: 1200 },
+  { date: 'May 4', views: 1800 },
+  { date: 'May 5', views: 2500 },
+  { date: 'May 6', views: 3100 },
+  { date: 'May 7', views: 3000 },
+  { date: 'May 8', views: 3700 },
+  { date: 'May 9', views: 4100 },
+  { date: 'May 10', views: 4300 },
+];
+
+// Audience demographics chart data
+const demographicsChartData = [
+  { age: '13-17', percent: 6.7 },
+  { age: '18-24', percent: 8.2 },
+  { age: '25-34', percent: 20 },
+  { age: '35-44', percent: 31.2 },
+  { age: '45-54', percent: 22.8 },
+  { age: '55-64', percent: 16.8 },
+  { age: '65+', percent: 8.6 },
+];
+
+const engagementsChartConfig = {
+  views: {
+    label: 'Views',
+    color: '#9F1D35',
+  },
+};
+
+const demographicsChartConfig = {
+  percent: {
+    label: 'Audience %',
+    color: '#9F1D35',
+  },
+};
+
+const mockInviteCreators = [
+  {
+    name: 'Alex Johnson',
+    followers: {
+      tiktok: '120K',
+      instagram: '85K',
+      facebook: '40K',
+      youtube: '15K',
+    },
+  },
+  {
+    name: 'Priya Patel',
+    followers: {
+      tiktok: '200K',
+      instagram: '150K',
+      facebook: '60K',
+      youtube: '30K',
+    },
+  },
+  {
+    name: 'Liam Smith',
+    followers: {
+      tiktok: '90K',
+      instagram: '70K',
+      facebook: '25K',
+      youtube: '10K',
+    },
+  },
+  {
+    name: 'Sophia Lee',
+    followers: {
+      tiktok: '300K',
+      instagram: '210K',
+      facebook: '80K',
+      youtube: '50K',
+    },
+  },
+  {
+    name: 'Noah Brown',
+    followers: {
+      tiktok: '60K',
+      instagram: '40K',
+      facebook: '20K',
+      youtube: '5K',
+    },
+  },
+  {
+    name: 'Emma Wilson',
+    followers: {
+      tiktok: '180K',
+      instagram: '120K',
+      facebook: '55K',
+      youtube: '25K',
+    },
+  },
+  {
+    name: 'Olivia Garcia',
+    followers: {
+      tiktok: '250K',
+      instagram: '170K',
+      facebook: '90K',
+      youtube: '40K',
+    },
+  },
+  {
+    name: 'Mason Martinez',
+    followers: {
+      tiktok: '110K',
+      instagram: '95K',
+      facebook: '35K',
+      youtube: '12K',
+    },
+  },
+];
+
 export default function CampaignAnalytics() {
   const { brandName, campaignId } = useParams();
   const navigate = useNavigate();
@@ -75,6 +191,8 @@ export default function CampaignAnalytics() {
   const pageSize = 7;
   const pageCount = Math.ceil(mockCreators.length / pageSize);
   const paginatedCreators = mockCreators.slice((page - 1) * pageSize, page * pageSize);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [invited, setInvited] = useState<Record<string, boolean>>({});
 
   // Use slugify for brand lookup
   const brand = brands.find(
@@ -138,6 +256,10 @@ export default function CampaignAnalytics() {
     </div>
   );
 
+  const handleInviteToggle = (name: string) => {
+    setInvited((prev) => ({ ...prev, [name]: !prev[name] }));
+  };
+
   return (
     <div className="w-full">
       {/* Breadcrumbs */}
@@ -185,76 +307,45 @@ export default function CampaignAnalytics() {
           </div>
           {/* Charts */}
           <div className="flex flex-col md:flex-row gap-6">
-            {/* Engagements Line Chart (placeholder) */}
+            {/* Engagements Bar Chart (shadcn/ui) */}
             <Card className="flex-1 p-6 rounded-2xl border border-gray-100 shadow-none">
-              <div className="flex items-center justify-between mb-2">
-                <div className="font-semibold text-lg">Engagements</div>
-                <select className="border border-gray-200 rounded-lg px-2 py-1 text-sm text-gray-600">
-                  <option>Views</option>
-                </select>
-              </div>
+              <div className="font-semibold text-lg mb-2">Engagements</div>
               <div className="text-3xl font-bold mb-1">4.3M</div>
               <div className="text-xs text-gray-500 mb-4">Engagement</div>
-              {/* Area chart */}
-              <svg viewBox="0 0 300 80" className="w-full h-28">
-                <defs>
-                  <linearGradient id="engageGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#9F1D35" stopOpacity="0.2" />
-                    <stop offset="100%" stopColor="#9F1D35" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <polyline
-                  fill="none"
-                  stroke="#9F1D35"
-                  strokeWidth="3"
-                  points="0,70 40,60 80,50 120,40 160,45 200,35 240,30 280,20"
-                />
-                <polygon
-                  fill="url(#engageGradient)"
-                  points="0,80 0,70 40,60 80,50 120,40 160,45 200,35 240,30 280,20 280,80"
-                />
-                {mockEngagements.map((pt, i) => (
-                  <circle key={i} cx={40 * i} cy={80 - pt.value * 15} r="4" fill="#9F1D35" />
-                ))}
-              </svg>
-              <div className="flex justify-between text-xs text-gray-400 mt-2">
-                {mockEngagements.map((pt) => (
-                  <span key={pt.date}>{pt.date}</span>
-                ))}
-              </div>
-              <div className="text-xs text-gray-500 text-center mt-2">Date Range</div>
+              <ChartContainer config={engagementsChartConfig} className="min-h-[240px] w-full">
+                <BarChart data={engagementsChartData} height={240} width={400} barSize={32}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
+                  <Bar dataKey="views" fill="#9F1D35" radius={4} isAnimationActive={false} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                </BarChart>
+              </ChartContainer>
             </Card>
-            {/* Audience Demographics Bar Chart (placeholder) */}
+            {/* Audience Demographics Bar Chart (shadcn/ui) */}
             <Card className="flex-1 p-6 rounded-2xl border border-gray-100 shadow-none">
-              <div className="flex items-center justify-between mb-2">
-                <div className="font-semibold text-lg">Audience Demographics</div>
-                <select className="border border-gray-200 rounded-lg px-2 py-1 text-sm text-gray-600">
-                  <option>Views</option>
-                </select>
-              </div>
-              <div className="flex items-end gap-2 h-32 mb-2">
-                {mockDemographics.map((d, i) => (
-                  <div key={d.age} className="flex flex-col items-center w-8">
-                    <div
-                      className="bg-[#9F1D35] rounded-t-md"
-                      style={{ height: `${d.percent * 1.5}px`, width: '100%' }}
-                    ></div>
-                    <span className="text-xs mt-1">{d.age}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="flex justify-between text-xs text-gray-400">
-                {mockDemographics.map((d) => (
-                  <span key={d.age}>{d.percent}%</span>
-                ))}
-              </div>
-              <div className="text-xs text-gray-500 text-center mt-2">Age Range</div>
+              <div className="font-semibold text-lg mb-2">Audience Demographics</div>
+              <ChartContainer config={demographicsChartConfig} className="min-h-[240px] w-full">
+                <BarChart data={demographicsChartData} height={240} width={400} barSize={32}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="age" tickLine={false} axisLine={false} tickMargin={8} />
+                  <Bar dataKey="percent" fill="#9F1D35" radius={4} isAnimationActive={false}>
+                    <LabelList dataKey="percent" position="top" formatter={(value: number) => `${value}%`} />
+                  </Bar>
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                </BarChart>
+              </ChartContainer>
             </Card>
           </div>
         </div>
       )}
       {activeTab === 'creators' && (
         <div className="w-full">
+          {/* Invite Creators Button */}
+          <div className="flex justify-end mb-4">
+            <Button className="bg-[#9F1D35] text-white" onClick={() => setInviteOpen(true)}>
+              Invite Creators
+            </Button>
+          </div>
           <Card className="p-0 mb-4 border border-gray-100 shadow-none rounded-2xl overflow-hidden">
             <div className="font-semibold text-lg px-6 py-4 border-b border-gray-100">Creators Name</div>
             <table className="w-full text-sm">
@@ -274,7 +365,10 @@ export default function CampaignAnalytics() {
                       <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 border border-gray-200">
                         {creator.name.split(' ').map(n => n[0]).join('').slice(0,2)}
                       </div>
-                      <span className="font-medium text-gray-900 flex items-center gap-1">
+                      <span
+                        className="font-medium text-gray-900 flex items-center gap-1 cursor-pointer hover:underline"
+                        onClick={() => navigate(`/brand/campaigns/${brandName}/${campaignId}/creator/${slugify(creator.name)}`)}
+                      >
                         {creator.name}
                         {creator.verified && <CheckCircle className="w-4 h-4 text-blue-500 ml-1" />}
                       </span>
@@ -341,6 +435,48 @@ export default function CampaignAnalytics() {
               </PaginationContent>
             </Pagination>
           </Card>
+          {/* Invite Creators Dialog */}
+          <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Invite Creators</DialogTitle>
+                <DialogDescription>Select creators to invite to your campaign.</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-2 mt-4 max-h-[60vh] overflow-y-auto pr-2">
+                {mockInviteCreators.map((creator) => {
+                  const isInvited = !!invited[creator.name];
+                  return (
+                    <div key={creator.name} className="px-4 py-3 rounded bg-gray-50 border border-gray-200 text-gray-900 flex flex-col gap-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-medium text-base">{creator.name}</span>
+                        <Button
+                          size="sm"
+                          className={
+                            isInvited
+                              ? 'bg-green-100 text-green-700 px-3 py-1 h-8 cursor-pointer border border-green-300'
+                              : 'bg-[#9F1D35] text-white px-3 py-1 h-8'
+                          }
+                          onClick={() => handleInviteToggle(creator.name)}
+                          disabled={false}
+                        >
+                          {isInvited ? 'Invited' : 'Invite'}
+                        </Button>
+                      </div>
+                      <div className="flex flex-wrap gap-4 mt-1 text-xs text-gray-700">
+                        <span className="flex items-center gap-1"><FaTiktok color="#9F1D35" size={16} /> {creator.followers.tiktok} TikTok</span>
+                        <span className="flex items-center gap-1"><FaInstagram color="#9F1D35" size={16} /> {creator.followers.instagram} Instagram</span>
+                        <span className="flex items-center gap-1"><FaFacebook color="#9F1D35" size={16} /> {creator.followers.facebook} Facebook</span>
+                        <span className="flex items-center gap-1"><FaYoutube color="#9F1D35" size={16} /> {creator.followers.youtube} YouTube</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex justify-end mt-6">
+                <Button onClick={() => setInviteOpen(false)} className="bg-[#9F1D35] text-white">Close</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       )}
       {activeTab === 'content' && (

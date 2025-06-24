@@ -49,6 +49,8 @@ export function BrandLayout({ children, user }: { children: React.ReactNode, use
     // Find the actual brand name from the brands data
     const brand = brands.find(b => slugify(b.name) === brandSlug);
     pageName = brand ? `${brand.name} Analytics` : 'Campaign Analytics';
+  } else if (location.pathname === '/brand/campaigns') {
+    pageName = 'My Campaigns';
   } else {
     pageName = location.pathname === "/" || location.pathname === "/brand-dashboard" ? "Dashboard" : 
       location.pathname.slice(1).split("/")[0].replace("brand-", "").split("-").map(word => 

@@ -242,6 +242,9 @@ const BrandCampaigns: React.FC = () => {
               <Plus size={20} />
               Create Campaign
             </Button>
+            <Button className="ml-2 flex items-center gap-2 bg-gray-100 text-[#9F1D35] hover:bg-gray-200 border border-[#9F1D35]" size="sm" onClick={() => navigate('/brand/non-campaign-feed')}>
+              Non Campaign Feed
+            </Button>
           </div>
         </div>
 
