@@ -29,6 +29,7 @@ const BrandBarter = lazy(() => import('./pages/brand/Barter'));
 const BrandAffiliate = lazy(() => import('./pages/brand/Affiliate'));
 const BrandWallet = lazy(() => import('./pages/brand/Wallet'));
 const BrandSettings = lazy(() => import('./pages/brand/Settings'));
+const CampaignAnalytics = lazy(() => import('./pages/brand/CampaignAnalytics'));
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -128,8 +129,8 @@ function App() {
                   <Routes>
                     <Route path="/" element={<BrandDashboard />} />
                     <Route path="/brand-dashboard" element={<BrandDashboard />} />
-                    <Route path="/brand-campaigns" element={<BrandCampaigns />} />
-                    <Route path="/brand-analytics" element={<BrandAnalytics />} />
+                    <Route path="/brand/campaigns" element={<BrandCampaigns />} />
+                    <Route path="/brand/campaigns/:brandName/:campaignId" element={<CampaignAnalytics />} />
                     <Route path="/brand-barter" element={<BrandBarter />} />
                     <Route path="/brand-affiliate" element={<BrandAffiliate />} />
                     <Route path="/brand-wallet" element={<BrandWallet />} />

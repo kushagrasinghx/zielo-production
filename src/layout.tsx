@@ -3,6 +3,14 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { BrandSidebar } from "@/components/brand-sidebar"
 import { NotificationDropdown } from "@/components/NotificationDropdown"
 import { useLocation } from "react-router-dom"
+import { brands } from './data/brands';
+
+const slugify = (str: string) =>
+  str
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
 
 export default function Layout({ children, user }: { children: React.ReactNode, user: any }) {
   const location = useLocation();
@@ -34,10 +42,19 @@ export default function Layout({ children, user }: { children: React.ReactNode, 
 
 export function BrandLayout({ children, user }: { children: React.ReactNode, user: any }) {
   const location = useLocation();
-  const pageName = location.pathname === "/" || location.pathname === "/brand-dashboard" ? "Dashboard" : 
-    location.pathname.slice(1).split("/")[0].replace("brand-", "").split("-").map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(" ");
+  let pageName: string;
+  const campaignMatch = location.pathname.match(/^\/brand\/campaigns\/([^/]+)\/(\d+)/);
+  if (campaignMatch) {
+    const brandSlug = campaignMatch[1];
+    // Find the actual brand name from the brands data
+    const brand = brands.find(b => slugify(b.name) === brandSlug);
+    pageName = brand ? `${brand.name} Analytics` : 'Campaign Analytics';
+  } else {
+    pageName = location.pathname === "/" || location.pathname === "/brand-dashboard" ? "Dashboard" : 
+      location.pathname.slice(1).split("/")[0].replace("brand-", "").split("-").map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1)
+      ).join(" ");
+  }
 
   return (
     <SidebarProvider>

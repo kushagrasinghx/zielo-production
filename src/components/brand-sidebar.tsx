@@ -23,12 +23,12 @@ export function BrandSidebar({ user }: { user: any }) {
     },
     {
       title: "Your Campaigns",
-      url: "/brand-campaigns",
+      url: "/brand/campaigns",
       icon: Briefcase,
     },
     {
       title: "Brand Analytics",
-      url: "/brand-analytics",
+      url: "/brand/analytics",
       icon: BarChart,
     },
     {
