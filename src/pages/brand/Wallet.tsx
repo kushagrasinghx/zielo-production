@@ -28,7 +28,6 @@ const exportOptions = [
 ];
 
 const Wallet: React.FC = () => {
-  const [activeTab] = useState('overview');
   const [showFilterPopup, setShowFilterPopup] = useState(false);
   const [showAddFunds, setShowAddFunds] = useState(false);
   const [showExport, setShowExport] = useState(false);
@@ -125,11 +124,6 @@ const Wallet: React.FC = () => {
 
   const handleExport = () => {
     setShowExport(true);
-  };
-
-  const handleEditCampaign = (campaign: any) => {
-    // Handle edit campaign logic
-    // TODO: Implement edit campaign logic
   };
 
   const clearSearch = () => {
@@ -354,7 +348,7 @@ const Wallet: React.FC = () => {
                   </span>
                 </TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="icon" onClick={() => handleEditCampaign(campaign)}>
+                  <Button variant="ghost" size="icon">
                     <Edit size={16} />
                   </Button>
                 </TableCell>

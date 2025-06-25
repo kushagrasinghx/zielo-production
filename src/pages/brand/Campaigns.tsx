@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { Plus, Search, Filter, DollarSign, X, Edit3, Pause, Trash2, Copy, Archive, ArchiveRestore } from 'lucide-react';
 import { FaInstagram, FaYoutube, FaTiktok } from 'react-icons/fa';
 import { brands } from '../../data/brands';
-import type { Campaign } from '../../data/types';
 import { Button } from '@/components/ui/button';
 import {
   Table,

@@ -79,7 +79,8 @@ export default function CollaborationStatus() {
         creatorsNeeded: 5,
         requirements: ["Use #EverEmGlow", "Tag @everem"],
         guidelines: ["Show before/after", "Explain benefits"],
-        coins: 250
+        coins: 250,
+        archived: false
       }
     },
     // Example 2: GlowMore - Eco-Friendly Makeup Tutorial
@@ -110,7 +111,8 @@ export default function CollaborationStatus() {
         creatorsNeeded: 3,
         requirements: ["Use #GlowMoreEco", "Tag @glowmore"],
         guidelines: ["Show application", "Highlight eco-features"],
-        coins: 300
+        coins: 300,
+        archived: false
       }
     }
   ]);
