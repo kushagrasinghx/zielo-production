@@ -25,7 +25,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 5,
         requirements: ["Use #EverEmGlow", "Tag @everem"],
         guidelines: ["Show before/after", "Explain benefits"],
-        coins: 250
+        coins: 250,
+        archived: true
       },
       {
         id: 2,
@@ -39,7 +40,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 4,
         requirements: ["Use #EverEmNights", "Tag @everem"],
         guidelines: ["Mention skin type", "Include product close-up"],
-        coins: 230
+        coins: 230,
+        archived: false
       },
       {
         id: 3,
@@ -53,7 +55,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 3,
         requirements: ["Use #EverEmRoutine", "Tag @everem"],
         guidelines: ["Good lighting", "Highlight packaging"],
-        coins: 200
+        coins: 200,
+        archived: false
       }
     ],
     ugcPortfolio: [
@@ -92,7 +95,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 3,
         requirements: ["Use #GlowMoreEco", "Tag @glowmore"],
         guidelines: ["Show application", "Highlight eco-features"],
-        coins: 300
+        coins: 300,
+        archived: false
       },
       {
         id: 2,
@@ -106,7 +110,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 4,
         requirements: ["Use #GlowEssentials", "Tag @glowmore"],
         guidelines: ["Natural light", "Show product usage"],
-        coins: 220
+        coins: 220,
+        archived: false
       }
     ],
     ugcPortfolio: [
@@ -145,7 +150,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 4,
         requirements: ["Use #TrailTrekAdventure", "Tag @trailtrek"],
         guidelines: ["Show landscape and gear in use"],
-        coins: 260
+        coins: 260,
+        archived: false
       },
       {
         id: 2,
@@ -159,7 +165,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 2,
         requirements: ["Use #TrekGearReview", "Tag @trailtrek"],
         guidelines: ["Talk about build quality and features"],
-        coins: 400
+        coins: 400,
+        archived: false
       }
     ],
     ugcPortfolio: [
@@ -198,7 +205,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 3,
         requirements: ["Use #TechNestLife", "Tag @technest"],
         guidelines: ["Show real-world usage"],
-        coins: 300
+        coins: 300,
+        archived: false
       },
       {
         id: 2,
@@ -212,7 +220,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 4,
         requirements: ["Use #DeskGoalsWithTechNest", "Tag @technest"],
         guidelines: ["Include before/after shots"],
-        coins: 240
+        coins: 240,
+        archived: false
       },
       {
         id: 3,
@@ -226,7 +235,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 5,
         requirements: ["Use #TechNestHaul", "Tag @technest"],
         guidelines: ["Keep it under 60s"],
-        coins: 220
+        coins: 220,
+        archived: false
       }
     ],
     ugcPortfolio: [
@@ -265,7 +275,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 4,
         requirements: ["Use #RefuelWithFitFuel", "Tag @fitfuel"],
         guidelines: ["Mention taste and texture"],
-        coins: 180
+        coins: 180,
+        archived: false
       },
       {
         id: 2,
@@ -279,7 +290,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 3,
         requirements: ["Use #CleanSnacking", "Tag @fitfuel"],
         guidelines: ["Emphasize clean labels"],
-        coins: 210
+        coins: 210,
+        archived: false
       }
     ],
     ugcPortfolio: [
@@ -318,7 +330,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 3,
         requirements: ["Use #MyHomeHues", "Tag @homehues"],
         guidelines: ["Emphasize ambiance and lighting"],
-        coins: 210
+        coins: 210,
+        archived: false
       }
     ],
     ugcPortfolio: [
@@ -357,7 +370,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 4,
         requirements: ["Use #PetSnackJoy", "Tag @petpal"],
         guidelines: ["Include pet reaction", "Use natural light"],
-        coins: 190
+        coins: 190,
+        archived: false
       },
       {
         id: 2,
@@ -371,7 +385,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 3,
         requirements: ["Use #PlayWithPetPal", "Tag @petpal"],
         guidelines: ["Show interaction and fun moments"],
-        coins: 220
+        coins: 220,
+        archived: false
       }
     ],
     ugcPortfolio: [
@@ -410,7 +425,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 4,
         requirements: ["Use #LuxeAuraMoment", "Tag @luxeaura"],
         guidelines: ["Elegant presentation", "Describe scent notes"],
-        coins: 400
+        coins: 400,
+        archived: false
       },
       {
         id: 2,
@@ -424,7 +440,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 3,
         requirements: ["Use #LuxeUnbox", "Tag @luxeaura"],
         guidelines: ["Show product details & packaging"],
-        coins: 380
+        coins: 380,
+        archived: false
       },
       {
         id: 3,
@@ -438,7 +455,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 5,
         requirements: ["Use #AuraImpressions", "Tag @luxeaura"],
         guidelines: ["Describe top, mid, base notes"],
-        coins: 360
+        coins: 360,
+        archived: false
       },
       {
         id: 4,
@@ -452,7 +470,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 4,
         requirements: ["Use #LuxeNight", "Tag @luxeaura"],
         guidelines: ["Soft lighting & mood"],
-        coins: 350
+        coins: 350,
+        archived: false
       },
       {
         id: 5,
@@ -466,7 +485,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 2,
         requirements: ["Use #LuxeGiveaway", "Tag @luxeaura"],
         guidelines: ["Include rules & prize details"],
-        coins: 420
+        coins: 420,
+        archived: false
       }
     ],
     ugcPortfolio: [
@@ -505,7 +525,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 3,
         requirements: ["Use #PlayPixelLearn", "Tag @playpixel"],
         guidelines: ["Show child engagement", "Highlight learning aspects"],
-        coins: 250
+        coins: 250,
+        archived: false
       },
       {
         id: 2,
@@ -519,7 +540,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 4,
         requirements: ["Use #PlayPixelFun", "Tag @playpixel"],
         guidelines: ["Show interaction & reactions"],
-        coins: 280
+        coins: 280,
+        archived: false
       }
     ],
     ugcPortfolio: [
@@ -558,7 +580,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 5,
         requirements: ["Use #RunWild", "Tag @runwild"],
         guidelines: ["Show running form", "Test durability"],
-        coins: 280
+        coins: 280,
+        archived: false
       }
     ],
     ugcPortfolio: [
@@ -597,7 +620,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 2,
         requirements: ["Use #BrewCraft", "Tag @brewcraft"],
         guidelines: ["Show brewing process", "Explain techniques"],
-        coins: 320
+        coins: 320,
+        archived: false
       },
       {
         id: 2,
@@ -611,7 +635,8 @@ export const brands: Brand[] = [
         creatorsNeeded: 3,
         requirements: ["Use #BrewCraftMornings", "Tag @brewcraft"],
         guidelines: ["Highlight aroma & taste"],
-        coins: 300
+        coins: 300,
+        archived: false
       }
     ],
     ugcPortfolio: [

@@ -185,7 +185,7 @@ export default function CampaignAnalytics() {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh]">
         <p className="text-gray-500 mb-4">Campaign not found!</p>
-        <Button variant="outline" onClick={() => navigate('/brand/campaigns')}>Back to Campaigns</Button>
+        <Button variant="outline" onClick={() => navigate('/brand-campaigns')}>Back to Campaigns</Button>
       </div>
     );
   }
@@ -245,7 +245,7 @@ export default function CampaignAnalytics() {
     <div className="w-full">
       {/* Breadcrumbs */}
       <div className="flex items-center gap-2 mb-6 text-sm text-gray-600">
-        <Link to="/brand/campaigns" className="hover:text-[#9F1D35] transition-colors">Campaigns</Link>
+        <Link to="/brand-campaigns" className="hover:text-[#9F1D35] transition-colors">Campaigns</Link>
         <span>/</span>
         <span className="text-gray-900">{campaign.title}</span>
       </div>
@@ -348,7 +348,7 @@ export default function CampaignAnalytics() {
                       </div>
                       <span
                         className="font-medium text-gray-900 flex items-center gap-1 cursor-pointer hover:underline"
-                        onClick={() => navigate(`/brand/campaigns/${brandName}/${campaignId}/creator/${slugify(creator.name)}`)}
+                        onClick={() => navigate(`/brand-campaigns/${brandName}/${campaignId}/creator/${slugify(creator.name)}`)}
                       >
                         {creator.name}
                         {creator.verified && <CheckCircle className="w-4 h-4 text-blue-500 ml-1" />}

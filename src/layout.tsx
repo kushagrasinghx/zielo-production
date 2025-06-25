@@ -43,13 +43,13 @@ export default function Layout({ children, user }: { children: React.ReactNode, 
 export function BrandLayout({ children, user }: { children: React.ReactNode, user: any }) {
   const location = useLocation();
   let pageName: string;
-  const campaignMatch = location.pathname.match(/^\/brand\/campaigns\/([^/]+)\/(\d+)/);
+  const campaignMatch = location.pathname.match(/^\/brand-campaigns\/([^/]+)\/(\d+)/);
   if (campaignMatch) {
     const brandSlug = campaignMatch[1];
     // Find the actual brand name from the brands data
     const brand = brands.find(b => slugify(b.name) === brandSlug);
     pageName = brand ? `${brand.name} Analytics` : 'Campaign Analytics';
-  } else if (location.pathname === '/brand/campaigns') {
+  } else if (location.pathname === '/brand-campaigns') {
     pageName = 'My Campaigns';
   } else {
     pageName = location.pathname === "/" || location.pathname === "/brand-dashboard" ? "Dashboard" : 

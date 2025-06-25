@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Plus, Search, Filter, DollarSign, X, Edit3, Pause, Trash2, Copy } from 'lucide-react';
+import { Plus, Search, Filter, DollarSign, X, Edit3, Pause, Trash2, Copy, Archive, ArchiveRestore } from 'lucide-react';
 import { FaInstagram, FaYoutube, FaTiktok } from 'react-icons/fa';
 import { brands } from '../../data/brands';
 import type { Campaign } from '../../data/types';
@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { useReactTable, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, flexRender } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useNavigate } from 'react-router-dom';
+import { Dialog } from '@/components/ui/dialog';
 
 const getFormatIcon = (format: string) => {
   switch (format) {
@@ -57,38 +58,32 @@ const BrandCampaigns: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilterPopup, setShowFilterPopup] = useState(false);
   const [filters, setFilters] = useState({
-    status: 'all',
     format: 'all',
     dateRange: 'all',
     budget: 'all',
   });
+  const [campaigns, setCampaigns] = useState(() => brands.flatMap((brand) => (brand.campaigns || []).map((c) => ({ ...c, brandName: brand.name }))));
+  const [confirmDialog, setConfirmDialog] = useState<{ open: boolean, campaignId?: number, action?: 'archive' | 'unarchive' } | null>(null);
   const navigate = useNavigate();
-
-  // Flatten all campaigns from all brands
-  const allCampaigns: (Campaign & { brandName: string; status: string })[] = brands.flatMap((brand) =>
-    (brand.campaigns || []).map((c) => ({ ...c, brandName: brand.name, status: 'Active' }))
-  );
 
   // Tabs
   const tabs = [
-    { id: 'all', label: 'Active', count: allCampaigns.filter((c) => c.status === 'Active').length },
-    { id: 'archived', label: 'Archived', count: 0 },
+    { id: 'all', label: 'Active', count: campaigns.filter((c) => !c.archived).length },
+    { id: 'archived', label: 'Archived', count: campaigns.filter((c) => c.archived).length },
   ];
 
   // Filtering logic for DataTable
   const filteredCampaigns = useMemo(() => {
-    return allCampaigns.filter((campaign) => {
+    return campaigns.filter((campaign) => {
+      if (activeTab === 'archived' && !campaign.archived) return false;
+      if (activeTab === 'all' && campaign.archived) return false;
       const matchesSearch =
         campaign.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         campaign.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         campaign.brandName.toLowerCase().includes(searchQuery.toLowerCase());
-      if (filters.status !== 'all' && campaign.status.toLowerCase() !== filters.status.toLowerCase()) {
-        return false;
-      }
       if (filters.format !== 'all' && campaign.type !== filters.format) {
         return false;
       }
-      // Budget filter (using coins as a proxy)
       if (filters.budget !== 'all') {
         if (filters.budget === 'low' && campaign.coins >= 250) return false;
         if (filters.budget === 'medium' && (campaign.coins < 250 || campaign.coins >= 400)) return false;
@@ -96,16 +91,16 @@ const BrandCampaigns: React.FC = () => {
       }
       return matchesSearch;
     });
-  }, [allCampaigns, searchQuery, filters]);
+  }, [campaigns, searchQuery, filters, activeTab]);
 
   // Minimal pagination logic (must come after filteredCampaigns)
   const [page, setPage] = useState(1);
-  const pageSize = 10; // or any number you want
+  const pageSize = 10;
   const pageCount = Math.ceil(filteredCampaigns.length / pageSize);
-  const paginatedCampaigns = filteredCampaigns.slice((page - 1) * pageSize, page * pageSize);
+  const paginatedCampaigns = useMemo(() => filteredCampaigns.slice((page - 1) * pageSize, page * pageSize), [filteredCampaigns, page]);
 
   // DataTable columns
-  const columns = useMemo<ColumnDef<Campaign & { brandName: string; status: string }>[]>(
+  const columns = useMemo<ColumnDef<typeof campaigns[0]>[]>(
     () => [
       {
         accessorKey: 'title',
@@ -114,7 +109,7 @@ const BrandCampaigns: React.FC = () => {
           <Button
             variant="link"
             className="p-0 h-auto"
-            onClick={() => navigate(`/brand/campaigns/${slugify(row.original.brandName)}/${row.original.id}`)}
+            onClick={() => navigate(`/brand-campaigns/${slugify(row.original.brandName)}/${row.original.id}`)}
           >
             {row.original.title}
           </Button>
@@ -163,16 +158,16 @@ const BrandCampaigns: React.FC = () => {
       {
         accessorKey: 'status',
         header: 'Status',
-        cell: () => (
-          <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-            Active
+        cell: ({ row }) => (
+          <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${row.original.archived ? 'bg-gray-200 text-gray-600' : 'bg-green-100 text-green-800'}`}>
+            {row.original.archived ? 'Archived' : 'Active'}
           </span>
         ),
       },
       {
         id: 'actions',
         header: 'Action',
-        cell: () => (
+        cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" title="Edit">
               <Edit3 size={16} />
@@ -186,6 +181,15 @@ const BrandCampaigns: React.FC = () => {
             <Button variant="ghost" size="icon" title="Delete">
               <Trash2 size={16} />
             </Button>
+            {row.original.archived ? (
+              <Button variant="ghost" size="icon" title="Unarchive" onClick={() => setConfirmDialog({ open: true, campaignId: row.original.id, action: 'unarchive' })}>
+                <ArchiveRestore size={16} />
+              </Button>
+            ) : (
+              <Button variant="ghost" size="icon" title="Archive" onClick={() => setConfirmDialog({ open: true, campaignId: row.original.id, action: 'archive' })}>
+                <Archive size={16} />
+              </Button>
+            )}
           </div>
         ),
       },
@@ -212,37 +216,43 @@ const BrandCampaigns: React.FC = () => {
   };
 
   const resetFilters = () => {
-    setFilters({ status: 'all', format: 'all', dateRange: 'all', budget: 'all' });
+    setFilters({ format: 'all', dateRange: 'all', budget: 'all' });
   };
 
   const clearSearch = () => setSearchQuery('');
+
+  // Archive/Unarchive handler
+  const handleArchiveChange = (id: number, action: 'archive' | 'unarchive') => {
+    setCampaigns((prev) => prev.map((c) => c.id === id ? { ...c, archived: action === 'archive' } : c));
+    setConfirmDialog(null);
+  };
 
   return (
     <>
       <div className="font-sans space-y-6">
         {/* Tabs and Create Campaign */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-2">
-            <nav className="flex space-x-8">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                    activeTab === tab.id
-                      ? 'border-[#9F1D35] text-[#9F1D35]'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  {tab.label} ({tab.count})
-                </button>
-              ))}
-            </nav>
-            <Button className="ml-4 flex items-center gap-2 bg-[#9F1D35] hover:bg-[#8a1a2e]" size="sm">
+        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 sm:gap-4 w-full">
+          <nav className="flex w-full sm:w-auto space-x-8 justify-center sm:justify-start mb-2 sm:mb-0">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === tab.id
+                    ? 'border-[#9F1D35] text-[#9F1D35]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                {tab.label} ({tab.count})
+              </button>
+            ))}
+          </nav>
+          <div className="flex w-full sm:w-auto items-center gap-2 justify-center sm:justify-end">
+            <Button className="flex-1 sm:flex-none flex items-center gap-2 bg-[#9F1D35] hover:bg-[#8a1a2e]" size="sm">
               <Plus size={20} />
               Create Campaign
             </Button>
-            <Button className="ml-2 flex items-center gap-2 bg-gray-100 text-[#9F1D35] hover:bg-gray-200 border border-[#9F1D35]" size="sm" onClick={() => navigate('/brand/non-campaign-feed')}>
+            <Button className="flex-1 sm:flex-none flex items-center gap-2 bg-gray-100 text-[#9F1D35] hover:bg-gray-200 border border-[#9F1D35]" size="sm" onClick={() => navigate('/brand/non-campaign-feed')}>
               Non Campaign Feed
             </Button>
           </div>
@@ -406,22 +416,6 @@ const BrandCampaigns: React.FC = () => {
 
             {/* Filter Options */}
             <div className="space-y-6">
-              {/* Status Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">Status</label>
-                <select
-                  value={filters.status}
-                  onChange={(e) => handleFilterChange('status', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9F1D35] focus:border-transparent"
-                >
-                  <option value="all">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="paused">Paused</option>
-                  <option value="draft">Draft</option>
-                  <option value="completed">Completed</option>
-                </select>
-              </div>
-
               {/* Format Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Format</label>
@@ -501,6 +495,25 @@ const BrandCampaigns: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Confirmation Dialog */}
+      {confirmDialog?.open && (
+        <Dialog open={confirmDialog.open} onOpenChange={() => setConfirmDialog(null)}>
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+            <div className="absolute inset-0 backdrop-blur-sm bg-white/10" onClick={() => setConfirmDialog(null)}></div>
+            <div className="relative bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl border border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">{confirmDialog.action === 'archive' ? 'Archive Campaign' : 'Unarchive Campaign'}</h2>
+              <p className="mb-6">Are you sure you want to {confirmDialog.action} this campaign?</p>
+              <div className="flex gap-3 justify-end">
+                <Button variant="outline" onClick={() => setConfirmDialog(null)}>Cancel</Button>
+                <Button className="bg-[#9F1D35] text-white hover:bg-[#8a1a2e]" onClick={() => handleArchiveChange(confirmDialog.campaignId!, confirmDialog.action!)}>
+                  Yes, {confirmDialog.action === 'archive' ? 'Archive' : 'Unarchive'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Dialog>
       )}
     </>
   );

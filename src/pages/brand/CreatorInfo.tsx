@@ -74,7 +74,7 @@ export default function CreatorInfo() {
     <div className="w-full">
       {/* Breadcrumbs */}
       <div className="flex items-center gap-2 mb-6 text-sm text-gray-600">
-        <Link to={`/brand/campaigns/${brandName}/${campaignId}`} state={{ tab: 'creators' }} className="hover:text-[#9F1D35] transition-colors">Creators list</Link>
+        <Link to={`/brand-campaigns/${brandName}/${campaignId}`} state={{ tab: 'creators' }} className="hover:text-[#9F1D35] transition-colors">Creators list</Link>
         <span>/</span>
         <span className="text-gray-900">Creator details</span>
       </div>

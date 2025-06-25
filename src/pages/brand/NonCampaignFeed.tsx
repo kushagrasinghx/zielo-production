@@ -43,7 +43,7 @@ export default function NonCampaignFeed() {
     <div className="w-full">
       {/* Breadcrumbs */}
       <div className="flex items-center gap-2 mb-6 text-sm text-gray-600">
-        <Link to="/brand/campaigns" className="hover:text-[#9F1D35] transition-colors">Campaigns</Link>
+        <Link to="/brand-campaigns" className="hover:text-[#9F1D35] transition-colors">Campaigns</Link>
         <span>/</span>
         <span className="text-gray-900">Non Campaign Feed</span>
       </div>

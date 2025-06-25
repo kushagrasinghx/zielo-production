@@ -11,6 +11,7 @@ export interface Campaign {
   requirements: string[];
   guidelines: string[];
   coins: number;
+  archived: boolean;
 }
 
 export interface UGCContent {
