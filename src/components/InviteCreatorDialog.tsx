@@ -20,7 +20,7 @@ function InviteCreatorDialog({
         <div className="flex flex-col gap-4 items-center">
           <div className="w-full flex flex-col gap-2">
             <span className="text-sm text-muted-foreground">Share this link to invite a creator:</span>
-            <div className="flex items-center gap-2 border rounded px-2 py-2 bg-muted">
+            <div className="flex items-center gap-2 border rounded px-2 py-3 bg-muted">
               <span className="truncate text-xs select-all" style={{maxWidth: '120px'}}>{link}</span>
             </div>
             <Button
