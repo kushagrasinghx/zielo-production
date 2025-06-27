@@ -1,4 +1,4 @@
-import { Home, Settings, Gift, Link2, BarChart } from "lucide-react"
+import { Home, Settings, Gift, Link2, BarChart, UserPlus, Clipboard } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -11,6 +11,10 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar"
 import { useLocation, Link } from "react-router-dom"
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import React, { useState } from 'react';
+import InviteCreatorDialog from "./InviteCreatorDialog";
 
 // Accept user as a prop
 export function AppSidebar({ user }: { user: any }) {
@@ -70,6 +74,21 @@ export function AppSidebar({ user }: { user: any }) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        {/* Invite Creator Dialog above Settings */}
+        <InviteCreatorDialog
+          trigger={
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <span className="flex items-center cursor-pointer">
+                    <UserPlus className="h-4 w-4" />
+                    <span>Invite Creator</span>
+                  </span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          }
+        />
         {/* Settings button at the bottom */}
         <SidebarMenu>
           <SidebarMenuItem>
@@ -104,4 +123,23 @@ export function AppSidebar({ user }: { user: any }) {
       </SidebarFooter>
     </Sidebar>
   )
+}
+
+function CopyInviteButton() {
+  const [copied, setCopied] = useState(false);
+  const link = 'https://zielo.app/invite/creator';
+  return (
+    <Button
+      size="sm"
+      variant="secondary"
+      onClick={() => {
+        navigator.clipboard.writeText(link);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1200);
+      }}
+      className="transition-all"
+    >
+      {copied ? 'Copied!' : 'Copy'}
+    </Button>
+  );
 } 
